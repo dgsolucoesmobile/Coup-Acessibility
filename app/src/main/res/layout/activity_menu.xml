@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorBackgrounLayout"
-    tools:context="com.well.whospy.MenuActivity">
+    tools:context="com.well.whospy.Activity.MenuActivity">
 
     <Button
         android:layout_width="match_parent"

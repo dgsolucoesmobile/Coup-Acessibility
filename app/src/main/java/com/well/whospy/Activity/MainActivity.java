@@ -1,5 +1,6 @@
-package com.well.whospy;
+package com.well.whospy.Activity;
 
+import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -9,10 +10,10 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.well.whospy.R;
 
 import java.util.Locale;
 
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             public void onInit(int status) {
                 if (status != TextToSpeech.ERROR){
                     textToSpeech.setLanguage(Locale.getDefault());
-                    speechMyText("APROXIME A CARTA DO CELULAR PARA FAZER A LEITURA!!!","");
+                    speechMyText("APROXIME A CARTA DO CELULAR PARA FAZER A LEITURA!!!");
                 }
             }
         });
@@ -135,9 +136,62 @@ public class MainActivity extends AppCompatActivity {
         return out;
     }
 
+    //Nome das Cartas
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void readNameCard(String id){
+
+        String nameCard;
+
+        switch (id){
+
+            //tag 01
+            case "04B2CBF2F54880":{
+                nameCard = "CARTA: DUQUE!!!!";
+                speechMyText(nameCard);
+                break;
+            }
+
+            //tag 02
+            case "04E60DB2D94980":{
+                nameCard = "CARTA: Assassino!!!";
+                speechMyText(nameCard);
+                break;
+            }
+
+            //tag 03
+            case "049ECBF2F54880":{
+                nameCard = "CARTA: Condessa!!!";
+                speechMyText(nameCard);
+                break;
+            }
+
+            //tag 04
+            case "04BD0EB2D94980":{
+                nameCard = "CARTA: Capitão!!!";
+                speechMyText(nameCard);
+                break;
+            }
+
+            //tag 05
+            case "04AE0DB2D94980":{
+                nameCard = "CARTA: Embaixador!!!";
+                speechMyText(nameCard);
+                break;
+            }
+
+            //tag desconhecida
+            default:{
+                nameCard = "A CARTA SELECIONADA NÃO ESTÁ CADASTRADA!!!";
+                speechMyText(nameCard);
+            }
+        }
+
+    }
+
     //Dados das Cartas
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void readDescription(String id){
+    public void readDescription(String id){
 
 
         String nomeCarta, descCarta;
@@ -146,57 +200,51 @@ public class MainActivity extends AppCompatActivity {
 
             //tag 01
             case "04B2CBF2F54880":{
-                nomeCarta = "CARTA: DUQUE!!!!";
                 descCarta = "Pegue três moedas do Tesouro Central!!! E Bloqueie o pedido de ajuda externa de outro jogador.";
-                speechMyText(nomeCarta,descCarta);
+                speechMyText(descCarta);
                 break;
             }
 
             //tag 02
             case "04E60DB2D94980":{
-                nomeCarta = "CARTA: Assassino!!!";
                 descCarta = "Pague três moedas e tente assassinar outro jogador.";
-                speechMyText(nomeCarta,descCarta);
+                speechMyText(descCarta);
                 break;
             }
 
             //tag 03
             case "049ECBF2F54880":{
-                nomeCarta = "CARTA: Condessa!!!";
                 descCarta = "Bloqueie uma tentativa de assassinato contra você.";
-                speechMyText(nomeCarta,descCarta);
+                speechMyText(descCarta);
                 break;
             }
 
             //tag 04
             case "04BD0EB2D94980":{
-                nomeCarta = "CARTA: Capitão!!!";
                 descCarta = "Pegue duas moedas de outro jogador!!! ou bloqueie outro jogador que tente pegar moedas de você.";
-                speechMyText(nomeCarta,descCarta);
+                speechMyText(descCarta);
                 break;
             }
 
             //tag 05
             case "04AE0DB2D94980":{
-                nomeCarta = "CARTA: Embaixador!!!";
                 descCarta = "Pegue duas cartas do Baralho da Corte!!! Troque de zero a duas cartas!!! Com as suas cartas viradas para baixo!!! e devolva duas cartas para o baralho.!!!";
-                speechMyText(nomeCarta,descCarta);
+                speechMyText(descCarta);
                 break;
             }
 
             //tag desconhecida
             default:{
-                nomeCarta = "";
                 descCarta = "A CARTA SELECIONADA NÃO ESTÁ CADASTRADA!!!";
-                speechMyText(nomeCarta, descCarta);
+                speechMyText(descCarta);
             }
         }
     }
 
-    //Usa o TTS para falar a descrição
+    //Usa o TTS para falar a descrição das cartas
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void speechMyText(String nomeCarta, String descCarta){
-        textToSpeech.speak(nomeCarta + descCarta,TextToSpeech.QUEUE_FLUSH,null,null);
+    private void speechMyText(String texto){
+        textToSpeech.speak(texto,TextToSpeech.QUEUE_FLUSH,null,null);
     }
 
     //Códigos extras
