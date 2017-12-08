@@ -22,7 +22,7 @@ import tardigrade.deck.ICard;
 import tardigrade.resources.impl.Deck;
 import tardigrade.resources.impl.Hub;
 
-public class MainActivity extends AppCompatActivity {
+public class ReadCardActivity extends AppCompatActivity {
 
     Tardigrade game;
 
@@ -40,9 +40,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        game = Tardigrade.getInstance(MainActivity.this);
-        deck = Deck.getInstance(MainActivity.this);
-        hub  = Hub.getInstance(MainActivity.this);
+        game = Tardigrade.getInstance(ReadCardActivity.this);
+        deck = Deck.getInstance(ReadCardActivity.this);
+        hub  = Hub.getInstance(ReadCardActivity.this);
 
         //Casts
         btLerCarta = (Button)findViewById(R.id.btLerCarta);
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ReadCardActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
     //Códigos extras
     private void enableForegroundDispatchSystem(){
 
-        Intent intent = new Intent(this,MainActivity.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
+        Intent intent = new Intent(this,ReadCardActivity.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
         IntentFilter[] intentFilters = new IntentFilter[]{};
 

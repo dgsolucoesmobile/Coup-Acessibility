@@ -24,7 +24,7 @@ public class MenuActivity extends AppCompatActivity {
         btLer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MenuActivity.this, MainActivity.class));
+                startActivity(new Intent(MenuActivity.this, ReadCardActivity.class));
             }
         });
 
