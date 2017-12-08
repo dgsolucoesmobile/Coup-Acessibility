@@ -14,8 +14,6 @@ public class MenuActivity extends AppCompatActivity {
 
     private Button btLer, btAtributos, btDicas;
 
-    MainActivity mainActivity;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +32,7 @@ public class MenuActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
-                mainActivity.readDescription(null);
+
             }
         });
 
