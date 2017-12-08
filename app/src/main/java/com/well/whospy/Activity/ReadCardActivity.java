@@ -115,8 +115,9 @@ public class ReadCardActivity extends AppCompatActivity {
 
         Toast.makeText(this, "Carta lida", Toast.LENGTH_SHORT).show();
         String tagContentID = ByteArrayToHexString(intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)).toString();
-        //Toast.makeText(this, "TAG ID: "+tagContentID.toString(), Toast.LENGTH_SHORT).show();
-        readDescription(tagContentID);
+        recebeDados();
+        chamaMetodos(recebeDados(),tagContentID);
+        //readDescription(tagContentID);
     }
 
     //Converte o ID da TAG
@@ -272,5 +273,41 @@ public class ReadCardActivity extends AppCompatActivity {
     protected void onPause() {
         disableForegroundDispatchSystem();
         super.onPause();
+    }
+
+    public int recebeDados(){
+
+        Bundle extra = getIntent().getExtras();
+        int dados;
+
+        if(extra != null){
+
+            dados = extra.getInt("botao");
+            return dados;
+
+        }
+        return 0;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void chamaMetodos(int dados, String id){
+        switch (dados){
+            case 1:{ //ler carta
+                Toast.makeText(this, "Entrou no Ler Carta", Toast.LENGTH_SHORT).show();
+                readNameCard(id);
+                break;
+            }
+
+            case 2:{ //atributos
+                Toast.makeText(this, "Entrou no Ler Descrição", Toast.LENGTH_SHORT).show();
+                readDescription(id);
+                break;
+            }
+
+            case 3:{
+                Toast.makeText(this, "DICAS: não faz nada ainda!", Toast.LENGTH_SHORT).show();
+                break;
+            }
+        }
     }
 }
