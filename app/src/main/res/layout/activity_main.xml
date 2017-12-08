@@ -5,35 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/colorBackgrounLayout"
     tools:context="com.dgsm.acessibilitycoup.Activity.ReadCardActivity">
 
-    <!--<Button
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:id="@+id/btLerCarta"
-        android:text="Ler carta"
-        android:layout_margin="@dimen/margin"/>
-
     <Button
+        android:id="@+id/btLerCarta"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:id="@+id/btEscrever"
-        android:text="Escrever na Tag"
-        android:layout_margin="20dp"/>-->
-
-    <!--<TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tagID"
-        android:text="ID TAG: "
-        android:layout_margin="@dimen/margin"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tagText"
-        android:text="TAG Text: "
-        android:layout_margin="@dimen/margin"/>-->
-
+        android:layout_height="200dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="150dp"
+        android:background="@color/colorBackgroundButton"
+        android:text="VOLTAR"
+        android:textColor="@color/colorTextButton"
+        android:textSize="40sp"
+        android:textStyle="bold" />
 
 </LinearLayout>
