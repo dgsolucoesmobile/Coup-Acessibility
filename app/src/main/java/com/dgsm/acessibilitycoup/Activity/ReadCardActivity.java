@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -29,7 +30,7 @@ public class ReadCardActivity extends AppCompatActivity {
     private Deck deck = null;
     private Hub  hub  = null;
 
-    Button btLerCarta;
+    Button btVoltar;
 
     NfcAdapter mNfcAdapter;
     TextToSpeech textToSpeech;
@@ -45,10 +46,17 @@ public class ReadCardActivity extends AppCompatActivity {
         hub  = Hub.getInstance(ReadCardActivity.this);
 
         //Casts
-        btLerCarta = (Button)findViewById(R.id.btLerCarta);
+        btVoltar = (Button)findViewById(R.id.btVoltar);
 
         verificaNFC();
         verificaTTS();
+
+        btVoltar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ReadCardActivity.this, MenuActivity.class));
+            }
+        });
     }
 
     @Override
@@ -82,7 +90,12 @@ public class ReadCardActivity extends AppCompatActivity {
             public void onInit(int status) {
                 if (status != TextToSpeech.ERROR){
                     textToSpeech.setLanguage(Locale.getDefault());
+
+                    //informaBotaoClicado(recebeDados());
+
                     speechMyText("APROXIME A CARTA DO CELULAR PARA FAZER A LEITURA!!!");
+
+
                 }
             }
         });
@@ -310,5 +323,27 @@ public class ReadCardActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void informaBotaoClicado(int dados){
+
+        switch (dados){
+            case 1:{
+                speechMyText("LER NOME DA CARTA!!!");
+                break;
+            }
+
+            case 2:{
+                speechMyText("LER DESCRIÇÃO DA CARTA!!!");
+                break;
+            }
+
+            case 3:{
+                speechMyText("LER DICAS DO JOGO!!!");
+                break;
+            }
+        }
+
     }
 }

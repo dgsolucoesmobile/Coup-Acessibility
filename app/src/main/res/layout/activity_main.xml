@@ -9,7 +9,7 @@
     tools:context="com.dgsm.acessibilitycoup.Activity.ReadCardActivity">
 
     <Button
-        android:id="@+id/btLerCarta"
+        android:id="@+id/btVoltar"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginLeft="15dp"
