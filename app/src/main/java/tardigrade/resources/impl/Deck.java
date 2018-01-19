@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -304,15 +303,18 @@ public class Deck extends SQLiteOpenHelper implements IDeck {
     public void useCard(ICard card){
         onUseCard.doit(Pack.create(Flag.RECOGNIZED_IN_GAME, card));
     }
-
+    
     @Override
     public void setOnUseCard(ICallback callback){
         onUseCard = callback;
 
     }
 
+
+
     @Override
     public void setOnLoadDeck(ICallback callback) {
         onLoadDeck = callback;
     }
+
 }

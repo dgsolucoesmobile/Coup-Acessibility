@@ -1,12 +1,15 @@
 package com.dgsm.acessibilitycoup.Activity;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
@@ -19,21 +22,23 @@ import com.dgsm.acessibilitycoup.R;
 import java.util.Locale;
 
 import tardigrade.Tardigrade;
+import tardigrade.comunication.IPack;
 import tardigrade.deck.ICard;
 import tardigrade.resources.impl.Deck;
 import tardigrade.resources.impl.Hub;
+import tardigrade.utils.ICallback;
 
 public class ReadCardActivity extends AppCompatActivity {
 
-    Tardigrade game;
-
+    private final String TAG = "ReadCardActivity";
+    private Tardigrade game;
     private Deck deck = null;
     private Hub  hub  = null;
+    private Button btVoltar;
 
-    Button btVoltar;
-
-    NfcAdapter mNfcAdapter;
-    TextToSpeech textToSpeech;
+    //NFC e TextToSpeech
+    private NfcAdapter mNfcAdapter;
+    private TextToSpeech textToSpeech;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -59,17 +64,6 @@ public class ReadCardActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if(requestCode == 0){
-            if(resultCode == RESULT_OK){
-                String result = intent.getStringExtra("SCAN_RESULT");
-                ICard card = deck.getCard(result);
-                card.execute();
-            }
-        }
-    }
-
     public void N(final String message){
         runOnUiThread(new Runnable() {
             @Override
@@ -79,32 +73,13 @@ public class ReadCardActivity extends AppCompatActivity {
         });
     }
 
-
     /* ************************************ TAG NFC ***********************************************/
-
-    public void verificaTTS(){
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onInit(int status) {
-                if (status != TextToSpeech.ERROR){
-                    textToSpeech.setLanguage(Locale.getDefault());
-
-                    //informaBotaoClicado(recebeDados());
-
-                    speechMyText("APROXIME A CARTA DO CELULAR PARA FAZER A LEITURA!!!");
-
-
-                }
-            }
-        });
-    }
 
     public void verificaNFC(){
 
         //Check for available NFC Adapter
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
 
         if (mNfcAdapter == null){
             Toast.makeText(this, "O dispositivo não possui NFC!", Toast.LENGTH_SHORT).show();
@@ -112,7 +87,14 @@ public class ReadCardActivity extends AppCompatActivity {
             return;
         }
 
-        if(( mNfcAdapter != null ) && ( !mNfcAdapter.isEnabled() )){
+        if((!mNfcAdapter.isEnabled())){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+                startActivity(intent);
+            }
             Toast.makeText(this, "Pede para Ativar", Toast.LENGTH_SHORT).show();
         }
 
@@ -131,6 +113,21 @@ public class ReadCardActivity extends AppCompatActivity {
         recebeDados();
         chamaMetodos(recebeDados(),tagContentID);
         //readDescription(tagContentID);
+    }
+
+    /* ******************************* TEXT TO SPEECH ******************************************/
+    public void verificaTTS(){
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onInit(int status) {
+                if (status != TextToSpeech.ERROR){
+                    textToSpeech.setLanguage(Locale.getDefault());
+                    speechMyText("APROXIME A CARTA DO CELULAR PARA FAZER A LEITURA!!!");
+                }
+            }
+        });
     }
 
     //Converte o ID da TAG
@@ -307,19 +304,19 @@ public class ReadCardActivity extends AppCompatActivity {
 
         switch (dados){
             case 1:{ //ler carta
-                Toast.makeText(this, "Entrou no Ler Carta", Toast.LENGTH_SHORT).show();
+                //Log.i(TAG,"Entrou no Ler Carta");
                 readNameCard(id);
                 break;
             }
 
             case 2:{ //atributos
-                Toast.makeText(this, "Entrou no Ler Descrição", Toast.LENGTH_SHORT).show();
+                //Log.i(TAG,"Entrou no Ler Descrição");
                 readDescription(id);
                 break;
             }
 
             case 3:{
-                Toast.makeText(this, "DICAS: não faz nada ainda!", Toast.LENGTH_SHORT).show();
+                //Log.i(TAG,"Não faz nada ainda - Button Dicas");
                 break;
             }
         }
@@ -346,4 +343,5 @@ public class ReadCardActivity extends AppCompatActivity {
         }
 
     }
+
 }
