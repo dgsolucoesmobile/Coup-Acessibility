@@ -2,14 +2,17 @@ package com.dgsm.acessibilitycoup.Activity;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -21,11 +24,9 @@ import com.dgsm.acessibilitycoup.R;
 import java.util.Locale;
 
 import tardigrade.Tardigrade;
-import tardigrade.comunication.IPack;
 import tardigrade.deck.ICard;
 import tardigrade.resources.impl.Deck;
 import tardigrade.resources.impl.Hub;
-import tardigrade.utils.ICallback;
 
 public class ReadCardActivity extends AppCompatActivity {
 
@@ -39,7 +40,17 @@ public class ReadCardActivity extends AppCompatActivity {
     private NfcAdapter mNfcAdapter;
     private TextToSpeech textToSpeech;
 
+    AlertDialog alertDialog1;
+    CharSequence[] values = {" Duque "," Assassino "," Condessa "," Capitão "," Embaixador "};
+    private static final String ARQUIVO_CARTAS = "ArquivoCartas";
+
+    private String cartaCadastrada = "Carta cadastrada com sucesso!";
+
     private ICard card;
+
+    /*Usados para recuperar nome e descrição das cartas, através do CSV*/
+    private String nameCard;
+    private String descriptionCard;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -63,19 +74,7 @@ public class ReadCardActivity extends AppCompatActivity {
                 startActivity(new Intent(ReadCardActivity.this, MenuActivity.class));
             }
         });
-
-        //pegaDadosCSV();
     }
-
-    /*private void pegaDadosCSV(){
-        deck.setOnUseCard(new ICallback() {
-            @Override
-            public void doit(IPack pack) {
-                ICard card = deck.getCard("1");
-                return null;
-            }
-        });
-    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -88,6 +87,7 @@ public class ReadCardActivity extends AppCompatActivity {
         }
     }
 
+    /*Mostra Mensagens Toast*/
     public void N(final String message){
         runOnUiThread(new Runnable() {
             @Override
@@ -119,11 +119,11 @@ public class ReadCardActivity extends AppCompatActivity {
                 Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
                 startActivity(intent);
             }
-            Toast.makeText(this, "Pede para Ativar", Toast.LENGTH_SHORT).show();
+            Log.i(TAG,"Pede para ativar o NFC!");
         }
 
         else
-            Toast.makeText(this, "Já está ativado", Toast.LENGTH_SHORT).show();
+            Log.i(TAG,"O NFC já está ativado!");
     }
 
     //Identifica a TAG NFC
@@ -132,12 +132,10 @@ public class ReadCardActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        Toast.makeText(this, "Carta lida", Toast.LENGTH_SHORT).show();
+        Log.i(TAG,"Carta lida");
         String tagContentID = ByteArrayToHexString(intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)).toString();
         recebeDados();
         chamaMetodos(recebeDados(),tagContentID);
-        //readDescription(tagContentID);
-        //pegaDadosCSV();
     }
 
     /* ******************************* TEXT TO SPEECH ******************************************/
@@ -177,114 +175,93 @@ public class ReadCardActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void readNameCard(String id){
 
-        String nameCard;
+        String mDuque = recuperarDados("duque");
+        String mAssassino = recuperarDados("assassino");
+        String mCondessa = recuperarDados("condessa");
+        String mCapitao = recuperarDados("capitao");
+        String mEmbaixador = recuperarDados("embaixador");
 
-        switch (id){
-
-            //tag 01
-            case "04B2CBF2F54880":{ //04B2CBF2F54880
-                card = deck.getCard("1");
-                nameCard = card.getName();
-                speechMyText(nameCard);
-                break;
-            }
-
-            //tag 02
-            case "04E60DB2D94980":{
-                card = deck.getCard("2");
-                nameCard = card.getName();
-                speechMyText(nameCard);
-                break;
-            }
-
-            //tag 03
-            case "049ECBF2F54880":{
-                card = deck.getCard("3");
-                nameCard = card.getName();
-                speechMyText(nameCard);
-                break;
-            }
-
-            //tag 04
-            case "04BD0EB2D94980":{
-                card = deck.getCard("4");
-                nameCard = card.getName();
-                speechMyText(nameCard);
-                break;
-            }
-
-            //tag 05
-            case "04AE0DB2D94980":{
-                card = deck.getCard("5");
-                nameCard = card.getName();
-                speechMyText(nameCard);
-                break;
-            }
-
-            //tag desconhecida
-            default:{
-                nameCard = "A CARTA SELECIONADA NÃO ESTÁ CADASTRADA!!!";
-                speechMyText(nameCard);
-            }
+        if (mDuque.equals(id)){
+            Log.i(TAG,"mDuque: "+id);
+            recuperaNomeCartaCSV("1");
         }
 
+        if (mAssassino.equals(id)){
+            Log.i(TAG,"mAssassino: "+id);
+            recuperaNomeCartaCSV("2");
+        }
+
+        if (mCondessa.equals(id)){
+            Log.i(TAG,"mCondessa: "+id);
+            recuperaNomeCartaCSV("3");
+        }
+
+        if (mCapitao.equals(id)){
+            Log.i(TAG,"mCapitao: "+id);
+            recuperaNomeCartaCSV("4");
+        }
+
+        if (mEmbaixador.equals(id)){
+            Log.i(TAG,"mEmbaixador: "+id);
+            recuperaNomeCartaCSV("5");
+        }
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void recuperaNomeCartaCSV(String idCsv){
+        card = deck.getCard(idCsv);
+        nameCard = card.getName();
+        speechMyText(nameCard);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void recuperaDescricaoCartaCSV(String idCsv){
+        card = deck.getCard(idCsv);
+        descriptionCard = card.getDescription();
+        speechMyText(descriptionCard);
     }
 
     //Dados das Cartas
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void readDescription(String id){
 
+        String mDuque = recuperarDados("duque");
+        String mAssassino = recuperarDados("assassino");
+        String mCondessa = recuperarDados("condessa");
+        String mCapitao = recuperarDados("capitao");
+        String mEmbaixador = recuperarDados("embaixador");
 
-        String nomeCarta, descCarta;
-
-        switch (id){
-
-            //tag 01
-            case "04B2CBF2F54880":{
-                card = deck.getCard("1");
-                descCarta = card.getDescription();
-                speechMyText(descCarta);
-                break;
-            }
-
-            //tag 02
-            case "04E60DB2D94980":{
-                card = deck.getCard("2");
-                descCarta = card.getDescription();
-                speechMyText(descCarta);
-                break;
-            }
-
-            //tag 03
-            case "049ECBF2F54880":{
-                card = deck.getCard("3");
-                descCarta = card.getDescription();
-                speechMyText(descCarta);
-                break;
-            }
-
-            //tag 04
-            case "04BD0EB2D94980":{
-                card = deck.getCard("4");
-                descCarta = card.getDescription();
-                speechMyText(descCarta);
-                break;
-            }
-
-            //tag 05
-            case "04AE0DB2D94980":{
-                card = deck.getCard("5");
-                descCarta = card.getDescription();
-                speechMyText(descCarta);
-                break;
-            }
-
-            //tag desconhecida
-            default:{
-                descCarta = "A CARTA SELECIONADA NÃO ESTÁ CADASTRADA!!!";
-                speechMyText(descCarta);
-            }
+        if (mDuque.equals(id)){
+            Log.i(TAG,"mDuque: "+id);
+            N("Duque");
+            recuperaDescricaoCartaCSV("1");
         }
+
+        if (mAssassino.equals(id)){
+            Log.i(TAG,"mAssassino: "+id);
+            N("Assassino");
+            recuperaDescricaoCartaCSV("2");
+        }
+
+        if (mCondessa.equals(id)){
+            Log.i(TAG,"mCondessa: "+id);
+            N("Condessa");
+            recuperaDescricaoCartaCSV("3");
+        }
+
+        if (mCapitao.equals(id)){
+            Log.i(TAG,"mCapitao: "+id);
+            N("Capitão");
+            recuperaDescricaoCartaCSV("4");
+        }
+
+        if (mEmbaixador.equals(id)){
+            Log.i(TAG,"mEmbaixador: "+id);
+            N("Embaixador");
+            recuperaDescricaoCartaCSV("5");
+        }
+
     }
 
     //Usa o TTS para falar a descrição das cartas
@@ -328,6 +305,7 @@ public class ReadCardActivity extends AppCompatActivity {
         if(extra != null){
 
             dados = extra.getInt("botao");
+            Log.i(TAG,"RECEBE_DADOS: "+dados);
             return dados;
 
         }
@@ -339,13 +317,13 @@ public class ReadCardActivity extends AppCompatActivity {
 
         switch (dados){
             case 1:{ //ler carta
-                Log.i(TAG,"Entrou no Ler Carta");
+                Log.i(TAG,"Entrou no Ler Carta: "+id);
                 readNameCard(id);
                 break;
             }
 
             case 2:{ //atributos
-                Log.i(TAG,"Entrou no Ler Descrição");
+                Log.i(TAG,"Entrou no Ler Descrição: "+id);
                 readDescription(id);
                 break;
             }
@@ -353,6 +331,11 @@ public class ReadCardActivity extends AppCompatActivity {
             case 3:{
                 Log.i(TAG,"Não faz nada ainda - Button Dicas");
                 break;
+            }
+
+            case 4:{
+                Log.i(TAG,"Cadastra carta");
+                createAlertDialogWithRadioButtonGroup(id);
             }
         }
     }
@@ -375,8 +358,82 @@ public class ReadCardActivity extends AppCompatActivity {
                 speechMyText("LER DICAS DO JOGO!!!");
                 break;
             }
+
+            case 4:{
+                Log.i(TAG,"CADASTRA CARTAS");
+            }
         }
 
+    }
+
+    public void createAlertDialogWithRadioButtonGroup(final String tagID) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Selecione a carta que deseja atribuir a TAG!");
+
+        builder.setSingleChoiceItems(values, -1, new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int item) {
+
+                switch (item) {
+                    case 0: {
+                        Log.i(TAG, "Duque");
+                        salvarDados("duque", tagID);
+                        break;
+                    }
+                    case 1: {
+                        Log.i(TAG, "Assassino");
+                        salvarDados("assassino", tagID);
+                        break;
+                    }
+                    case 2: {
+                        Log.i(TAG, "Condessa");
+                        salvarDados("condessa", tagID);
+                        break;
+                    }
+                    case 3: {
+                        Log.i(TAG, "Capitão");
+                        salvarDados("capitao", tagID);
+                        break;
+                    }
+                    case 4: {
+                        Log.i(TAG, "Embaixador");
+                        salvarDados("embaixador", tagID);
+                        break;
+                    }
+                }
+                alertDialog1.dismiss();
+            }
+        });
+        alertDialog1 = builder.create();
+        alertDialog1.show();
+    }
+
+    private void salvarDados(String nomeCarta, String tagCarta){
+
+        limpaDadosSharedPreferences(tagCarta);
+
+        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(nomeCarta, tagCarta);
+        editor.commit();
+        Toast.makeText(this, "Carta "+nomeCarta.toUpperCase()+" cadastrada com sucesso!", Toast.LENGTH_SHORT).show();
+        Log.i(TAG,"Nome Carta: "+nomeCarta+"\tTAG ID: "+tagCarta);
+    }
+
+    private String recuperarDados(String nameCard){
+        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
+        String cardID = preferences.getString(nameCard,"Carta não cadastrada!");
+        //Toast.makeText(this, "Carta Desconhecida!", Toast.LENGTH_SHORT).show();
+        return cardID;
+    }
+
+    private void limpaDadosSharedPreferences(String removerCarta){
+        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(removerCarta);
+        editor.commit();
     }
 
 }

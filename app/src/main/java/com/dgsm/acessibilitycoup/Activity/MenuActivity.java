@@ -12,6 +12,8 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -23,9 +25,8 @@ import java.lang.reflect.Method;
 
 public class MenuActivity extends AppCompatActivity {
 
-    private static final String TAG = "MAINACTIVITY";
+    private static final String TAG = "MenuActivity";
     private Button btLer, btAtributos, btDicas;
-    ReadCardActivity readCardActivity;
 
     NfcAdapter mNfcAdapter;
 
@@ -66,7 +67,6 @@ public class MenuActivity extends AppCompatActivity {
 
     public void verificaNFC(){
 
-        Toast.makeText(MenuActivity.this, "mCasts", Toast.LENGTH_SHORT).show();
         //Check for available NFC Adapter
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
@@ -87,9 +87,9 @@ public class MenuActivity extends AppCompatActivity {
                 Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
                 startActivity(intent);
             }
-                Toast.makeText(this, "Pede para Ativar", Toast.LENGTH_SHORT).show();
+            Log.i(TAG,"Pede para ativar o NFC!");
         }else
-            Toast.makeText(this, "Já está ativado", Toast.LENGTH_SHORT).show();
+            Log.i(TAG,"O NFC já está ativado!");
     }
 
     public static boolean powerNfc(boolean isOn, Context context) {
@@ -123,10 +123,10 @@ public class MenuActivity extends AppCompatActivity {
 
 
     private void mCasts(){
-        Toast.makeText(MenuActivity.this, "mCasts", Toast.LENGTH_SHORT).show();
-        btLer = (Button) findViewById(R.id.btLerCarta);
-        btAtributos = (Button) findViewById(R.id.btAtributos);
-        btDicas = (Button) findViewById(R.id.btDicas);
+        Log.i(TAG,"mCasts");
+        btLer = findViewById(R.id.btLerCarta);
+        btAtributos = findViewById(R.id.btAtributos);
+        btDicas = findViewById(R.id.btDicas);
     }
 
     private void dados(int dados){
@@ -138,13 +138,36 @@ public class MenuActivity extends AppCompatActivity {
 
     private void checkPermissionNFC(){
 
-        Toast.makeText(this, "Entrou nas permissões", Toast.LENGTH_SHORT).show();
+        Log.i(TAG,"Entrou nas permissões!");
 
         if (ActivityCompat.checkSelfPermission(this,NFC_SERVICE) != PackageManager.PERMISSION_GRANTED){
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)){
                 ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
             }else
                 ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
+        }
+    }
+
+    /* Menus na ActionBar*/
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_add:{
+                Log.i(TAG,"Clicou no ADD");
+                dados(4);
+                Log.i(TAG,"Foi passado o valor 4 para o Dados");
+                //startActivity(new Intent(MenuActivity.this,CadastroActivity.class));
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
