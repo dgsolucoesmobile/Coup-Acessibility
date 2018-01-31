@@ -1,9 +1,7 @@
 package tardigrade.resources.impl;
 
-import tardigrade.Tardigrade;
 import tardigrade.comunication.IPack;
 import tardigrade.game.IState;
-import tardigrade.utils.Flag;
 import tardigrade.utils.ICallback;
 
 public class State implements IState{

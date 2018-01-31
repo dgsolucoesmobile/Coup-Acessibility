@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Acessibilidade Coup</string>
+
+    <string name="regras_jogo">
+        Cada jogador começa com duas moedas e duas influências/cartas. O baralho possui quinze cartas com três cópias de cinco
+        personagens diferentes, cada um com suas próprias habilidades:
+        AÇÕES LIVRES!
+        Renda: Pegue uma moeda do Tesouro Central.
+        Ajuda Externa: Pegue duas moedas do Tesouro Central. (Pode ser bloqueada pelo Duque)
+        Golpe de Estado: Pague sete moedas para o Tesouro Central e aplique um Golpe contra outro jogador\',
+        forçando-o a perder uma carta. (Se você possuir dez moedas, você deve realizar esta ação)
+        Se você disser que tem um determinado personagem, e algum oponente lhe contestar,
+        e você não quiser revelar o personagem que você possui, você perde uma carta, virando um de seus personagens para cima.
+        Personagens virados para cima não podem ser usados, e se os seus dois personagens forem virados para cima,
+        você está fora do jogo.
+        Se você tiver o personagem em questão e escolher revelá-lo, o oponente perde uma carta,
+        você embaralha o seu personagem revelado no baralho central e pega uma nova carta, podendo ser o mesmo personagem ou não.
+        O último jogador a possuir uma carta ainda virada para baixo — vence o jogo!</string>
 </resources>

@@ -166,6 +166,12 @@ public class MenuActivity extends AppCompatActivity {
                 //startActivity(new Intent(MenuActivity.this,CadastroActivity.class));
                 return true;
             }
+
+            case R.id.action_clear:{
+                Log.i(TAG,"Clicou no Apagar");
+                dados(5);
+            }
+
             default:
                 return super.onOptionsItemSelected(item);
         }

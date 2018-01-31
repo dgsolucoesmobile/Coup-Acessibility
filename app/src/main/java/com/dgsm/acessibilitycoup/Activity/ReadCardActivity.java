@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.dgsm.acessibilitycoup.R;
+import com.dgsm.acessibilitycoup.Utils.RegrasJogo;
 
 import java.util.Locale;
 
@@ -41,7 +42,12 @@ public class ReadCardActivity extends AppCompatActivity {
     private TextToSpeech textToSpeech;
 
     AlertDialog alertDialog1;
-    CharSequence[] values = {" Duque "," Assassino "," Condessa "," Capitão "," Embaixador "};
+    CharSequence[] values = {" Duque 1", " Duque 2", " Duque 3",
+                             " Assassino 1"," Assassino 2"," Assassino 3",
+                             " Condessa 1"," Condessa 2"," Condessa 3",
+                             " Capitão 1"," Capitão 2"," Capitão 3",
+                             " Embaixador 1"," Embaixador 2"," Embaixador 3"};
+
     private static final String ARQUIVO_CARTAS = "ArquivoCartas";
 
     private String cartaCadastrada = "Carta cadastrada com sucesso!";
@@ -51,6 +57,13 @@ public class ReadCardActivity extends AppCompatActivity {
     /*Usados para recuperar nome e descrição das cartas, através do CSV*/
     private String nameCard;
     private String descriptionCard;
+
+    /*Usados para recuperar os dados do SharedPreferences*/
+    private String[] mDuque      = new String[3];
+    private String[] mAssassino  = new String[3];
+    private String[] mCondessa   = new String[3];
+    private String[] mCapitao    = new String[3];
+    private String[] mEmbaixador = new String[3];
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -63,7 +76,7 @@ public class ReadCardActivity extends AppCompatActivity {
         hub  = Hub.getInstance(ReadCardActivity.this);
 
         //Casts
-        btVoltar = (Button)findViewById(R.id.btVoltar);
+        btVoltar = findViewById(R.id.btVoltar);
 
         verificaNFC();
         verificaTTS();
@@ -147,7 +160,16 @@ public class ReadCardActivity extends AppCompatActivity {
             public void onInit(int status) {
                 if (status != TextToSpeech.ERROR){
                     textToSpeech.setLanguage(Locale.getDefault());
-                    speechMyText("APROXIME A CARTA DO CELULAR PARA FAZER A LEITURA!!!");
+                        if(recebeDados() == 1)
+                            speechMyText("LER NOME! APROXIME A CARTA DO CELULAR!!!");
+                        else if(recebeDados() == 2)
+                            speechMyText("LER DESCRIÇÃO! APROXIME A CARTA DO CELULAR!!!");
+                        else if(recebeDados() == 3)
+                            speechMyText("LER REGRAS! APROXIME A CARTA DO CELULAR!!!");
+                        else if(recebeDados() == 4)
+                            speechMyText("CADASTRAR TAGS! APROXIME A CARTA DO CELULAR!!!");
+                        else if(recebeDados() == 5)
+                            speechMyText("APAGAR DADOS DAS TAGS! APROXIME A CARTA DO CELULAR!!!");
                 }
             }
         });
@@ -175,37 +197,56 @@ public class ReadCardActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void readNameCard(String id){
 
-        String mDuque = recuperarDados("duque");
-        String mAssassino = recuperarDados("assassino");
-        String mCondessa = recuperarDados("condessa");
-        String mCapitao = recuperarDados("capitao");
-        String mEmbaixador = recuperarDados("embaixador");
+        recuperaDadosParaVariaveis();
 
-        if (mDuque.equals(id)){
+        if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
             Log.i(TAG,"mDuque: "+id);
             recuperaNomeCartaCSV("1");
         }
 
-        if (mAssassino.equals(id)){
+        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
             Log.i(TAG,"mAssassino: "+id);
             recuperaNomeCartaCSV("2");
         }
 
-        if (mCondessa.equals(id)){
+        if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
             Log.i(TAG,"mCondessa: "+id);
             recuperaNomeCartaCSV("3");
         }
 
-        if (mCapitao.equals(id)){
+
+        if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
             Log.i(TAG,"mCapitao: "+id);
             recuperaNomeCartaCSV("4");
         }
 
-        if (mEmbaixador.equals(id)){
+
+        if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
             Log.i(TAG,"mEmbaixador: "+id);
             recuperaNomeCartaCSV("5");
         }
+    }
 
+    private void recuperaDadosParaVariaveis() {
+        mDuque[0] = recuperarDados("duque1");
+        mDuque[1] = recuperarDados("duque2");
+        mDuque[2] = recuperarDados("duque3");
+
+        mAssassino[0] = recuperarDados("assassino1");
+        mAssassino[1] = recuperarDados("assassino2");
+        mAssassino[2] = recuperarDados("assassino3");
+
+        mCondessa[0] = recuperarDados("condessa1");
+        mCondessa[1] = recuperarDados("condessa2");
+        mCondessa[2] = recuperarDados("condessa3");
+
+        mCapitao[0] = recuperarDados("capitao1");
+        mCapitao[1] = recuperarDados("capitao2");
+        mCapitao[2] = recuperarDados("capitao3");
+
+        mEmbaixador[0] = recuperarDados("embaixador1");
+        mEmbaixador[1] = recuperarDados("embaixador2");
+        mEmbaixador[2] = recuperarDados("embaixador3");
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -226,42 +267,34 @@ public class ReadCardActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void readDescription(String id){
 
-        String mDuque = recuperarDados("duque");
-        String mAssassino = recuperarDados("assassino");
-        String mCondessa = recuperarDados("condessa");
-        String mCapitao = recuperarDados("capitao");
-        String mEmbaixador = recuperarDados("embaixador");
+        recuperaDadosParaVariaveis();
 
-        if (mDuque.equals(id)){
+        if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
             Log.i(TAG,"mDuque: "+id);
-            N("Duque");
             recuperaDescricaoCartaCSV("1");
         }
 
-        if (mAssassino.equals(id)){
+        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
             Log.i(TAG,"mAssassino: "+id);
-            N("Assassino");
             recuperaDescricaoCartaCSV("2");
         }
 
-        if (mCondessa.equals(id)){
+        if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
             Log.i(TAG,"mCondessa: "+id);
-            N("Condessa");
             recuperaDescricaoCartaCSV("3");
         }
 
-        if (mCapitao.equals(id)){
+
+        if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
             Log.i(TAG,"mCapitao: "+id);
-            N("Capitão");
             recuperaDescricaoCartaCSV("4");
         }
 
-        if (mEmbaixador.equals(id)){
+
+        if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
             Log.i(TAG,"mEmbaixador: "+id);
-            N("Embaixador");
             recuperaDescricaoCartaCSV("5");
         }
-
     }
 
     //Usa o TTS para falar a descrição das cartas
@@ -288,13 +321,24 @@ public class ReadCardActivity extends AppCompatActivity {
     protected void onResume() {
 
         enableForegroundDispatchSystem();
+        textToSpeech.stop();
+        Log.i(TAG,"onResume");
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         disableForegroundDispatchSystem();
+        textToSpeech.stop();
+        Log.i(TAG,"onPause");
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        textToSpeech.stop();
+        Log.i(TAG,"onDestroy");
+        super.onDestroy();
     }
 
     public int recebeDados(){
@@ -329,41 +373,25 @@ public class ReadCardActivity extends AppCompatActivity {
             }
 
             case 3:{
-                Log.i(TAG,"Não faz nada ainda - Button Dicas");
+                Log.i(TAG,"Entrou no Dicas");
+                RegrasJogo regras = new RegrasJogo();
+                String myRegras = regras.mRegras();
+                speechMyText(myRegras);
                 break;
             }
 
             case 4:{
                 Log.i(TAG,"Cadastra carta");
                 createAlertDialogWithRadioButtonGroup(id);
+                break;
+            }
+
+            case 5: {
+                Log.i(TAG,"Limpa todo os dados de Tags armazenados");
+                limpaTodosDadosSharedPreferences();
+                break;
             }
         }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void informaBotaoClicado(int dados){
-
-        switch (dados){
-            case 1:{
-                speechMyText("LER NOME DA CARTA!!!");
-                break;
-            }
-
-            case 2:{
-                speechMyText("LER DESCRIÇÃO DA CARTA!!!");
-                break;
-            }
-
-            case 3:{
-                speechMyText("LER DICAS DO JOGO!!!");
-                break;
-            }
-
-            case 4:{
-                Log.i(TAG,"CADASTRA CARTAS");
-            }
-        }
-
     }
 
     public void createAlertDialogWithRadioButtonGroup(final String tagID) {
@@ -378,28 +406,86 @@ public class ReadCardActivity extends AppCompatActivity {
 
                 switch (item) {
                     case 0: {
-                        Log.i(TAG, "Duque");
-                        salvarDados("duque", tagID);
+                        Log.i(TAG, "Duque 1");
+                        salvarDados("duque1", tagID);
                         break;
                     }
                     case 1: {
-                        Log.i(TAG, "Assassino");
-                        salvarDados("assassino", tagID);
+                        Log.i(TAG, "Duque 2");
+                        salvarDados("duque2", tagID);
                         break;
                     }
                     case 2: {
-                        Log.i(TAG, "Condessa");
-                        salvarDados("condessa", tagID);
+                        Log.i(TAG, "Duque3");
+                        salvarDados("duque3", tagID);
                         break;
                     }
+
+
                     case 3: {
-                        Log.i(TAG, "Capitão");
-                        salvarDados("capitao", tagID);
+                        Log.i(TAG, "Assassino 1");
+                        salvarDados("assassino1", tagID);
                         break;
                     }
                     case 4: {
-                        Log.i(TAG, "Embaixador");
-                        salvarDados("embaixador", tagID);
+                        Log.i(TAG, "Assassino 2");
+                        salvarDados("assassino2", tagID);
+                        break;
+                    }
+                    case 5: {
+                        Log.i(TAG, "Assassino 3");
+                        salvarDados("assassino3", tagID);
+                        break;
+                    }
+
+
+                    case 6: {
+                        Log.i(TAG, "Condessa 1");
+                        salvarDados("condessa1", tagID);
+                        break;
+                    }
+                    case 7: {
+                        Log.i(TAG, "Condessa 2");
+                        salvarDados("condessa2", tagID);
+                        break;
+                    }
+                    case 8: {
+                        Log.i(TAG, "Condessa 3");
+                        salvarDados("condessa3", tagID);
+                        break;
+                    }
+
+
+                    case 9: {
+                        Log.i(TAG, "Capitão 1");
+                        salvarDados("capitao1", tagID);
+                        break;
+                    }
+                    case 10: {
+                        Log.i(TAG, "Capitão 2");
+                        salvarDados("capitao2", tagID);
+                        break;
+                    }
+                    case 11: {
+                        Log.i(TAG, "Capitão 3");
+                        salvarDados("capitao3", tagID);
+                        break;
+                    }
+
+
+                    case 12: {
+                        Log.i(TAG, "Embaixador 1");
+                        salvarDados("embaixador1", tagID);
+                        break;
+                    }
+                    case 13: {
+                        Log.i(TAG, "Embaixador 2");
+                        salvarDados("embaixador2", tagID);
+                        break;
+                    }
+                    case 14: {
+                        Log.i(TAG, "Embaixador 3");
+                        salvarDados("embaixador3", tagID);
                         break;
                     }
                 }
@@ -434,6 +520,15 @@ public class ReadCardActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.remove(removerCarta);
         editor.commit();
+    }
+
+    public void limpaTodosDadosSharedPreferences(){
+        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
+        Toast.makeText(this, "Dados limpos com sucesso!", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(ReadCardActivity.this, MenuActivity.class));
     }
 
 }
