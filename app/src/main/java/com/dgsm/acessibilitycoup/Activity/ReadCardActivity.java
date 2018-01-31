@@ -1,8 +1,6 @@
 package com.dgsm.acessibilitycoup.Activity;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,6 +11,7 @@ import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -40,6 +39,8 @@ public class ReadCardActivity extends AppCompatActivity {
     private NfcAdapter mNfcAdapter;
     private TextToSpeech textToSpeech;
 
+    private ICard card;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,29 @@ public class ReadCardActivity extends AppCompatActivity {
                 startActivity(new Intent(ReadCardActivity.this, MenuActivity.class));
             }
         });
+
+        //pegaDadosCSV();
+    }
+
+    /*private void pegaDadosCSV(){
+        deck.setOnUseCard(new ICallback() {
+            @Override
+            public void doit(IPack pack) {
+                ICard card = deck.getCard("1");
+                return null;
+            }
+        });
+    }*/
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == 0){
+            if (resultCode == RESULT_OK){
+                String result = intent.getStringExtra("SCAN_RESULT");
+                ICard card = deck.getCard(result);
+                card.execute();
+            }
+        }
     }
 
     public void N(final String message){
@@ -113,6 +137,7 @@ public class ReadCardActivity extends AppCompatActivity {
         recebeDados();
         chamaMetodos(recebeDados(),tagContentID);
         //readDescription(tagContentID);
+        //pegaDadosCSV();
     }
 
     /* ******************************* TEXT TO SPEECH ******************************************/
@@ -157,36 +182,41 @@ public class ReadCardActivity extends AppCompatActivity {
         switch (id){
 
             //tag 01
-            case "04B2CBF2F54880":{
-                nameCard = "CARTA: DUQUE!!!!";
+            case "04B2CBF2F54880":{ //04B2CBF2F54880
+                card = deck.getCard("1");
+                nameCard = card.getName();
                 speechMyText(nameCard);
                 break;
             }
 
             //tag 02
             case "04E60DB2D94980":{
-                nameCard = "CARTA: Assassino!!!";
+                card = deck.getCard("2");
+                nameCard = card.getName();
                 speechMyText(nameCard);
                 break;
             }
 
             //tag 03
             case "049ECBF2F54880":{
-                nameCard = "CARTA: Condessa!!!";
+                card = deck.getCard("3");
+                nameCard = card.getName();
                 speechMyText(nameCard);
                 break;
             }
 
             //tag 04
             case "04BD0EB2D94980":{
-                nameCard = "CARTA: Capitão!!!";
+                card = deck.getCard("4");
+                nameCard = card.getName();
                 speechMyText(nameCard);
                 break;
             }
 
             //tag 05
             case "04AE0DB2D94980":{
-                nameCard = "CARTA: Embaixador!!!";
+                card = deck.getCard("5");
+                nameCard = card.getName();
                 speechMyText(nameCard);
                 break;
             }
@@ -211,35 +241,40 @@ public class ReadCardActivity extends AppCompatActivity {
 
             //tag 01
             case "04B2CBF2F54880":{
-                descCarta = "Pegue três moedas do Tesouro Central!!! E Bloqueie o pedido de ajuda externa de outro jogador.";
+                card = deck.getCard("1");
+                descCarta = card.getDescription();
                 speechMyText(descCarta);
                 break;
             }
 
             //tag 02
             case "04E60DB2D94980":{
-                descCarta = "Pague três moedas e tente assassinar outro jogador.";
+                card = deck.getCard("2");
+                descCarta = card.getDescription();
                 speechMyText(descCarta);
                 break;
             }
 
             //tag 03
             case "049ECBF2F54880":{
-                descCarta = "Bloqueie uma tentativa de assassinato contra você.";
+                card = deck.getCard("3");
+                descCarta = card.getDescription();
                 speechMyText(descCarta);
                 break;
             }
 
             //tag 04
             case "04BD0EB2D94980":{
-                descCarta = "Pegue duas moedas de outro jogador!!! ou bloqueie outro jogador que tente pegar moedas de você.";
+                card = deck.getCard("4");
+                descCarta = card.getDescription();
                 speechMyText(descCarta);
                 break;
             }
 
             //tag 05
             case "04AE0DB2D94980":{
-                descCarta = "Pegue duas cartas do Baralho da Corte!!! Troque de zero a duas cartas!!! Com as suas cartas viradas para baixo!!! e devolva duas cartas para o baralho.!!!";
+                card = deck.getCard("5");
+                descCarta = card.getDescription();
                 speechMyText(descCarta);
                 break;
             }
@@ -304,19 +339,19 @@ public class ReadCardActivity extends AppCompatActivity {
 
         switch (dados){
             case 1:{ //ler carta
-                //Log.i(TAG,"Entrou no Ler Carta");
+                Log.i(TAG,"Entrou no Ler Carta");
                 readNameCard(id);
                 break;
             }
 
             case 2:{ //atributos
-                //Log.i(TAG,"Entrou no Ler Descrição");
+                Log.i(TAG,"Entrou no Ler Descrição");
                 readDescription(id);
                 break;
             }
 
             case 3:{
-                //Log.i(TAG,"Não faz nada ainda - Button Dicas");
+                Log.i(TAG,"Não faz nada ainda - Button Dicas");
                 break;
             }
         }
