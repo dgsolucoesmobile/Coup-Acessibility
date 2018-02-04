@@ -28,4 +28,8 @@ dependencies {
 
     //Android Util Code - Api
     implementation 'com.blankj:utilcode:1.12.5'
+
+    //Material Dialogs
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,43 +7,51 @@
     android:background="@color/colorBackgrounLayout"
     tools:context="com.dgsm.acessibilitycoup.Activity.MenuActivity">
 
-    <Button
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:id="@+id/btLerCarta"
-        android:text="LER CARTA"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:textColor="@color/colorTextButton"
-        android:background="@color/colorBackgroundButton"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:id="@+id/btAtributos"
-        android:text="DESCRIÇÃO"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:textColor="@color/colorTextButton"
-        android:background="@color/colorBackgroundButton"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:id="@+id/btJogar"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:background="@color/colorBackgroundButton"
+            android:text="@string/jogar"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="50dp"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:id="@+id/btDicas"
-        android:text="REGRAS"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:textColor="@color/colorTextButton"
-        android:background="@color/colorBackgroundButton"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:id="@+id/btCadastrar"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:background="@color/colorBackgroundButton"
+            android:text="CADASTRAR CARTAS"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="40dp"/>
 
-</LinearLayout>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:id="@+id/btApagar"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:background="@color/colorBackgroundButton"
+            android:text="APAGAR DADOS DAS CARTAS"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="40dp"/>
+
+
+    </LinearLayout>
+
+</ScrollView>

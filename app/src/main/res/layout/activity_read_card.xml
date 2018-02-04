@@ -16,9 +16,9 @@
         android:layout_marginTop="@dimen/margin"
         android:layout_marginBottom="@dimen/margin"
         android:background="@color/colorBackgroundButton"
-        android:text="VOLTAR"
+        android:text="@string/voltar"
         android:textColor="@color/colorTextButton"
-        android:textSize="40sp"
+        android:textSize="80sp"
         android:textStyle="bold" />
 
 </LinearLayout>

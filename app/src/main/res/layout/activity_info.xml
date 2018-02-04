@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBackgrounLayout"
+    tools:context="com.dgsm.acessibilitycoup.Activity.Info">
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:id="@+id/btLerCarta"
+        android:text="LER NOME DA CARTA"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:layout_marginTop="60dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:textColor="@color/colorTextButton"
+        android:background="@color/colorBackgroundButton"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:id="@+id/btAtributos"
+        android:text="DESCRIÇÃO DA CARTA"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:textColor="@color/colorTextButton"
+        android:background="@color/colorBackgroundButton"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:id="@+id/btDicas"
+        android:text="DESCRIÇÃO DETALHADA DA CARTA"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:textColor="@color/colorTextButton"
+        android:background="@color/colorBackgroundButton"/>
+
+</LinearLayout>

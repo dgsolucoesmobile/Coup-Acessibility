@@ -16,4 +16,6 @@
         Se você tiver o personagem em questão e escolher revelá-lo, o oponente perde uma carta,
         você embaralha o seu personagem revelado no baralho central e pega uma nova carta, podendo ser o mesmo personagem ou não.
         O último jogador a possuir uma carta ainda virada para baixo — vence o jogo!</string>
+    <string name="jogar">JOGAR</string>
+    <string name="voltar">VOLTAR</string>
 </resources>

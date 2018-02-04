@@ -1,71 +1,71 @@
 package com.dgsm.acessibilitycoup.Activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
 import android.os.Build;
-import android.provider.Settings;
-import android.speech.tts.TextToSpeech;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.dgsm.acessibilitycoup.R;
 import com.dgsm.acessibilitycoup.ReadCardActivity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Locale;
 
-public class MenuActivity extends AppCompatActivity {
+public class Info extends AppCompatActivity {
+
+    private static final String TAG = "Info";
+    private Button btLer, btAtributos, btDicas;
 
     NfcAdapter mNfcAdapter;
-    static final String TAG = "MainActivity";
-    TextToSpeech textToSpeech;
-
-    private Button btJogar;
-    private Button btCadastrar;
-    private Button btApagar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_menu);
 
-        setTitle("Menu Principal");
-        verificaTTS(); //Verifica se o dispositivo tem suporte ao TTS
-        verificaNFC(); //Verifica se o dispositivo tem suporte ao NFC e está ativado
+        setContentView(R.layout.activity_info);
 
-        btJogar = findViewById(R.id.btJogar);
-        btCadastrar = findViewById(R.id.btCadastrar);
-        btApagar = findViewById(R.id.btApagar);
+        setTitle("Tela ler informações das Cartas");
+        checkPermissionNFC();
+        mCasts();
+        verificaNFC();
 
-        btJogar.setOnClickListener(new View.OnClickListener() {
+        btLer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dados(1);
             }
         });
 
-        btCadastrar.setOnClickListener(new View.OnClickListener() {
+        btAtributos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dados(2);
+                dados(4);
             }
         });
 
-        btApagar.setOnClickListener(new View.OnClickListener() {
+        btDicas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dados(3);
+                dados(5);
             }
         });
 
@@ -76,16 +76,16 @@ public class MenuActivity extends AppCompatActivity {
         //Check for available NFC Adapter
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
+
         if (mNfcAdapter == null){
-            //Toast.makeText(this, "O dispositivo não possui NFC!", Toast.LENGTH_SHORT).show();
-            speechMyText("O seu dispositivo não possui NFC!!!");
+            Toast.makeText(this, "O dispositivo não possui NFC!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
         if((!mNfcAdapter.isEnabled())) {
-            speechMyText("Por favor ative o NFC do seu Dispositivo!!!");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+
                 Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
                 startActivity(intent);
             } else {
@@ -97,30 +97,44 @@ public class MenuActivity extends AppCompatActivity {
             Log.i(TAG,"O NFC já está ativado!");
     }
 
-    /*Verifica se o Dispositivo possui suporte ao TextToSpeech*/
-    public void verificaTTS(){
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onInit(int status) {
-                if (status != TextToSpeech.ERROR){
-                    textToSpeech.setLanguage(Locale.getDefault());
-                }
-            }
-        });
-    }
-
-    private void speechMyText(String texto){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            textToSpeech.speak(texto,TextToSpeech.QUEUE_FLUSH,null,null);
-        }
+    private void mCasts(){
+        Log.i(TAG,"mCasts");
+        btLer = findViewById(R.id.btLerCarta);
+        btAtributos = findViewById(R.id.btAtributos);
+        btDicas = findViewById(R.id.btDicas);
     }
 
     private void dados(int dados){
         Intent intent = new Intent(this, ReadCardActivity.class);
         intent.putExtra("botao",dados);
         startActivity(intent);
+    }
+
+    /*Recebe os dados passados pela Activity de ReadCardActivity*/
+    private int recebeDados(){
+
+        Bundle extra = getIntent().getExtras();
+
+        int dados;
+
+        if(extra != null){
+            dados = extra.getInt("mDados");
+            Log.i(TAG,"RECEBE_DADOS: "+dados);
+            return dados;
+        }
+        return 0;
+    }
+
+    private void checkPermissionNFC(){
+
+        Log.i(TAG,"Entrou nas permissões!");
+
+        if (ActivityCompat.checkSelfPermission(this,NFC_SERVICE) != PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)){
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
+            }else
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
+        }
     }
 
 }
