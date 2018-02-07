@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorBackgrounLayout"
-    tools:context="com.dgsm.acessibilitycoup.Activity.MenuActivity">
+    tools:context="com.dgsm.accessibilitycoup.Activity.MenuActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,9 +14,9 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="150dp"
             android:id="@+id/btJogar"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:layout_marginLeft="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
             android:background="@color/colorBackgroundButton"
@@ -27,7 +27,7 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="150dp"
             android:id="@+id/btCadastrar"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="@dimen/margin"
@@ -40,7 +40,7 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="150dp"
             android:id="@+id/btApagar"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="@dimen/margin"
@@ -50,8 +50,6 @@
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="40dp"/>
-
-
     </LinearLayout>
 
 </ScrollView>

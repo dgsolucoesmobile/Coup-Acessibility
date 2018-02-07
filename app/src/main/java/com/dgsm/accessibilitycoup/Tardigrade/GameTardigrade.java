@@ -1,4 +1,4 @@
-package com.dgsm.acessibilitycoup.Tardigrade;
+package com.dgsm.accessibilitycoup.Tardigrade;
 
 import android.app.Activity;
 

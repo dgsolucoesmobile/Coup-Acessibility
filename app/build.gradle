@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId 'com.dgsm.acessibilitycoup'
+        applicationId 'com.dgsm.accessibilitycoup'
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
@@ -25,10 +25,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:26.+'
-
     //Android Util Code - Api
     implementation 'com.blankj:utilcode:1.12.5'
-
     //Material Dialogs
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'

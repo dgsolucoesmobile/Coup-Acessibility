@@ -1,29 +1,32 @@
-package com.dgsm.acessibilitycoup;
+package com.dgsm.accessibilitycoup.Activity;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
-import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.dgsm.acessibilitycoup.Activity.Info;
-import com.dgsm.acessibilitycoup.Activity.MenuActivity;
-import com.dgsm.acessibilitycoup.Activity.RegisterCardActivity;
-import com.dgsm.acessibilitycoup.Utils.RegrasJogo;
+import com.dgsm.accessibilitycoup.R;
 
 import java.util.Locale;
 
@@ -31,9 +34,11 @@ import tardigrade.Tardigrade;
 import tardigrade.deck.ICard;
 import tardigrade.resources.impl.Deck;
 
-public class ReadCardActivity extends AppCompatActivity {
+public class InfoActivity extends AppCompatActivity {
 
-    private final String TAG = "ReadCardActivity";
+    private static final String TAG = "InfoActivity";
+    private Button btNome, btDescricao, btDetalhes;
+
     private Tardigrade game;
     private Deck deck = null;
 
@@ -65,69 +70,63 @@ public class ReadCardActivity extends AppCompatActivity {
 
     int[] mContador = new int[5];
 
+    String idUltimaCarta;
+
+    Toast toast;
+    LayoutInflater inflater;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_read_card);
+        setContentView(R.layout.activity_info);
 
-        game = Tardigrade.getInstance(ReadCardActivity.this);
-        deck = Deck.getInstance(ReadCardActivity.this);
-        //Casts
-        btVoltar = findViewById(R.id.btVoltar);
+        setTitle("Tela ler informações das Cartas");
+        mCasts();
+        game = Tardigrade.getInstance(this);
+        deck = Deck.getInstance(this);
+        toast = new Toast(this);
+        inflater = getLayoutInflater();
 
-        //Verifica o NFC e TTS
         verificaNFC();
-        verificaTTS();
 
-        setTitleActivity(recebeDados());
-
-        btVoltar.setOnClickListener(new View.OnClickListener() {
+        btNome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (recebeDados() == 1 || recebeDados() == 2 || recebeDados() == 3)
-                    startActivity(new Intent(ReadCardActivity.this, MenuActivity.class));
-                else if (recebeDados() == 4 || recebeDados() == 5 || recebeDados() == 5)
-                    startActivity(new Intent(ReadCardActivity.this, Info.class));
+                readNameCard(recuperarDados("idUltimaCarta"));
             }
         });
+
+        btDescricao.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                readDescription(recuperarDados("idUltimaCarta"));
+            }
+        });
+
+        btDetalhes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                readDescriptionDetailed(recuperarDados("idUltimaCarta"));
+            }
+        });
+
     }
 
-    /*Seta o titulo da Activity*/
-    private void setTitleActivity(int dados){
-        switch (dados){
-            case 1:{
-                setTitle("Tela de Ler Carta");
-                break;
-            }
-
-            case 2:{
-                setTitle("Tela de Cadastro");
-                break;
-            }
-
-            case 3:{
-                setTitle("Tela de Apagar Dados");
-                break;
-            }
-
-            case 4:{
-                setTitle("Tela de Descrição");
-                break;
-            }
-
-            case 5:{
-                setTitle("Tela de Descrição Detalhada");
-                break;
-            }
-        }
+    private void mCasts(){
+        Log.i(TAG,"mCasts");
+        btNome = findViewById(R.id.btNome);
+        btDescricao = findViewById(R.id.btDescricao);
+        btDetalhes = findViewById(R.id.btDetalhes);
     }
 
+    /*Cadastrar Cartas*/
     private void alertDialogCadastrar(final String id){
         new MaterialDialog.Builder(this)
-                .title("Selecione a carta que deseja atribuir a TAG!")
+                .title("Tela de Cadastro!\nSelecione a carta que deseja atribuir a TAG!")
                 .items(values)
                 .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
@@ -267,73 +266,15 @@ public class ReadCardActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void enviaDados(int meusDados){
-        Intent intent = new Intent(this, Info.class);
-        intent.putExtra("mDados",meusDados);
-        startActivity(intent);
-    }
-
-    /*Recebe os dados passados pela Activity de Menu*/
-    private int recebeDados(){
-
-        Bundle extra = getIntent().getExtras();
-
-        int dados;
-
-        if(extra != null){
-            dados = extra.getInt("botao");
-            Log.i(TAG,"RECEBE_DADOS: "+dados);
-            return dados;
-        }
-        return 0;
-    }
-
-    /*Chama os métodos correspondentes a cada dado passado*/
-    public void chamaMetodos(int dados, String id){
-
-        //N("A carta foi lida");
-
-        switch (dados){
-            case 1:{ //ler carta
-                Log.i(TAG,"Entrou no Ler Carta: "+id);
-                readNameCard(id);
-                break;
-            }
-
-            case 2:{ //atributos
-                Log.i(TAG,"Cadastra carta: "+id);
-                alertDialogCadastrar(id);
-                break;
-            }
-
-            case 3:{
-                Log.i(TAG,"Entrou Apagar Dados");
-                limpaTodosDadosSharedPreferences();
-                break;
-            }
-
-            case 4:{
-                Log.i(TAG,"Entrou no Ler Descrição: "+id);
-                readDescription(id);
-                break;
-            }
-
-            case 5: {
-                Log.i(TAG,"Entrou no Ler Descrição Detalhada");
-                readDescriptionDetailed(id);
-                break;
-            }
-        }
-    }
-
     /*Mostra Mensagens Toast*/
     public void N(final String message){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(ReadCardActivity.this, message, Toast.LENGTH_SHORT).show();
-            }
-        });
+        View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
+        TextView myText = layout.findViewById(R.id.text);
+        myText.setText(message);
+        toast.setView(layout);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER,0,100);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     /*Recupera as informações do SharedPreferences para as Variáveis*/
@@ -357,59 +298,81 @@ public class ReadCardActivity extends AppCompatActivity {
         mEmbaixador[0] = recuperarDados("embaixador1");
         mEmbaixador[1] = recuperarDados("embaixador2");
         mEmbaixador[2] = recuperarDados("embaixador3");
+
+        idUltimaCarta = recuperarDados("idUltimaCarta");
     }
 
     /*Recupera o nome da carta do CSV*/
     private void recuperaNomeCartaCSV(String idCsv){
         card = deck.getCard(idCsv);
         nameCard = card.getName();
-        Toast.makeText(this, "A carta lida foi: "+nameCard, Toast.LENGTH_SHORT).show();
-        Log.i(TAG,"A carta lida foi: "+nameCard);
-        startActivity(new Intent(ReadCardActivity.this,Info.class));
+        N("A carta lida foi: "+nameCard);
+        //Log.i(TAG,"A carta lida foi: "+nameCard);
+        //startActivity(new Intent(this,InfoActivity.class));
     }
 
     /*Recupera a descrição da carta do CSV*/
     private void recuperaDescricaoCartaCSV(String idCsv){
         card = deck.getCard(idCsv);
         descriptionCard = card.getDescription();
-        speechMyText(descriptionCard);
-        if(!textToSpeech.isSpeaking())
-            startActivity(new Intent(ReadCardActivity.this,Info.class));
+        N(descriptionCard);
+        //speechMyText(descriptionCard);
+//        if(!textToSpeech.isSpeaking())
+//            startActivity(new Intent(this,InfoActivity.class));
     }
+
+//    private void enviaDados(String idCsv){
+//        Intent intent = new Intent(this, InfoActivity.class);
+//        intent.putExtra("idCsv",idCsv);
+//        startActivity(intent);
+//    }
 
     /*Nome das Cartas*/
     public void readNameCard(String id){
 
         recuperaDadosParaVariaveis();
 
+        Log.i(TAG,"\n\nÚltimo ID lido: "+id);
+        Log.i(TAG,"mDuque[0]: "+mDuque[0]);
+        Log.i(TAG,"mDuque[1]: "+mDuque[1]);
+        Log.i(TAG,"mDuque[2]: "+mDuque[2]);
+
         if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
             Log.i(TAG,"mDuque: "+id);
             recuperaNomeCartaCSV("1");
+            salvarDadosUltimaCartaLida(id);
         }
 
-        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
+        else if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
             Log.i(TAG,"mAssassino: "+id);
             recuperaNomeCartaCSV("2");
-            if (!textToSpeech.isSpeaking()){
-                startActivity(new Intent(this,Info.class));
-            }
+            salvarDadosUltimaCartaLida(id);
         }
 
-        if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
+        else if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
             Log.i(TAG,"mCondessa: "+id);
             recuperaNomeCartaCSV("3");
+            salvarDadosUltimaCartaLida(id);
         }
 
 
-        if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
+        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
             Log.i(TAG,"mCapitao: "+id);
             recuperaNomeCartaCSV("4");
+            salvarDadosUltimaCartaLida(id);
         }
 
 
-        if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
+        else if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
             Log.i(TAG,"mEmbaixador: "+id);
             recuperaNomeCartaCSV("5");
+            salvarDadosUltimaCartaLida(id);
+        }
+
+        else if (id.equals("")){
+            N("LEIA UMA CARTA ANTES");
+        }else{
+            alertDialogCadastrar(id);
         }
 
     }
@@ -418,6 +381,13 @@ public class ReadCardActivity extends AppCompatActivity {
     public void readDescription(String id){
 
         recuperaDadosParaVariaveis();
+
+        Log.i(TAG,"\n\nReadDescription: ");
+        Log.i(TAG,"Último ID lido: "+id);
+        Log.i(TAG,"mDuque[0]: "+mDuque[0]);
+        Log.i(TAG,"mDuque[1]: "+mDuque[1]);
+        Log.i(TAG,"mDuque[2]: "+mDuque[2]);
+
 
         if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
             Log.i(TAG,"mDuque: "+id);
@@ -449,6 +419,12 @@ public class ReadCardActivity extends AppCompatActivity {
             Log.i(TAG,"mEmbaixador: "+id);
             //N("Embaixador");
             recuperaDescricaoCartaCSV("5");
+        }
+
+        else if (id.equals("")){
+            N("LEIA UMA CARTA ANTES");
+        }else{
+            alertDialogCadastrar(id);
         }
     }
 
@@ -488,8 +464,13 @@ public class ReadCardActivity extends AppCompatActivity {
             //N("Embaixador");
             recuperaDescricaoCartaCSV("10");
         }
-    }
 
+        else if (id.equals("")){
+            N("LEIA UMA CARTA ANTES");
+        }else{
+            alertDialogCadastrar(id);
+        }
+    }
 
     /************************************** SHARED PREFERENCES *********************************************/
     private void salvarDados(String nome,String nomeCarta, String tagCarta){
@@ -501,7 +482,19 @@ public class ReadCardActivity extends AppCompatActivity {
         editor.putString(nomeCarta, tagCarta);
         editor.commit();
         N("Carta "+nome+" cadastrada com sucesso!");
-        Log.i(TAG,"Nome Carta: "+nomeCarta+"\tTAG ID: "+tagCarta);
+        Log.i(TAG,"\n\nNome Carta: "+nomeCarta+"\tTAG ID: "+tagCarta);
+    }
+
+    private void salvarDadosUltimaCartaLida(String idUltimaCarta){
+
+        limpaDadoCartaEspecifica("idUltimaCarta");
+
+        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("idUltimaCarta", idUltimaCarta);
+        editor.commit();
+        //N("Carta "+nome+" cadastrada com sucesso!");
+        Log.i(TAG,"\n\nid da última carta SALVA foi: "+idUltimaCarta);
     }
 
     private String recuperarDados(String nameCard){
@@ -513,7 +506,15 @@ public class ReadCardActivity extends AppCompatActivity {
     private void limpaDadoCartaEspecifica(String removerCarta){
         SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
+        Log.i(TAG,"\n\nRemoverCarta: "+removerCarta);
         editor.remove(removerCarta);
+        editor.commit();
+    }
+
+    private void limpaDadosUltimaCartaLida(String idUltimaCarta){
+        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(idUltimaCarta);
         editor.commit();
     }
 
@@ -522,25 +523,35 @@ public class ReadCardActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
-        Toast.makeText(this, "Dados limpos com sucesso!", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(ReadCardActivity.this, Info.class));
+        N("Dados apagados com sucesso!");
     }
 
-
     /************************************* MÉTODOS DA TAG NFC ***********************************************/
+    private void checkPermissionNFC(){
+
+        Log.i(TAG,"Entrou nas permissões!");
+
+        if (ActivityCompat.checkSelfPermission(this,NFC_SERVICE) != PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)){
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
+            }else
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
+        }
+    }
+
     public void verificaNFC(){
 
         //Check for available NFC Adapter
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if (mNfcAdapter == null){
-            Toast.makeText(this, "O dispositivo não possui NFC!", Toast.LENGTH_SHORT).show();
+            N("O seu dispositivo não possui NFC!!!");
             finish();
             return;
         }
 
         if((!mNfcAdapter.isEnabled())){
-            Toast.makeText(this, "Ative o NFC do seu dispositivo!", Toast.LENGTH_SHORT).show();
+            N("Ative o NFC do seu dispositivo!");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
                 startActivity(intent);
@@ -560,8 +571,7 @@ public class ReadCardActivity extends AppCompatActivity {
         super.onNewIntent(intent);
         Log.i(TAG,"Carta lida");
         String tagContentID = ByteArrayToHexString(intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)).toString();
-        recebeDados();
-        chamaMetodos(recebeDados(),tagContentID);
+        readNameCard(tagContentID);
     }
 
     /*Converte o ID da TAG de Hexadecimal para Decimal*/
@@ -583,8 +593,7 @@ public class ReadCardActivity extends AppCompatActivity {
 
     /*Códigos extras da TAG NFC*/
     private void enableForegroundDispatchSystem(){
-
-        Intent intent = new Intent(this,ReadCardActivity.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
+        Intent intent = new Intent(this,InfoActivity.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
         IntentFilter[] intentFilters = new IntentFilter[]{};
 
@@ -595,6 +604,7 @@ public class ReadCardActivity extends AppCompatActivity {
         mNfcAdapter.disableForegroundDispatch(this);
     }
 
+
     /**************************************** TEXT TO SPEECH *************************************************/
     public void verificaTTS(){
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -602,24 +612,24 @@ public class ReadCardActivity extends AppCompatActivity {
             public void onInit(int status){
                 if (status != TextToSpeech.ERROR){
                     textToSpeech.setLanguage(Locale.getDefault());
-                    if(recebeDados() == 1){
-                        speechMyText("LER NOME! APROXIME A CARTA DO CELULAR!!!");
-                    }
-
-                    else if(recebeDados() == 2){
-                        speechMyText("CADASTRAR TAGS! APROXIME A CARTA DO CELULAR!!!");
-                    }
-
-                    else if(recebeDados() == 3){
-                        speechMyText("APAGAR DADOS DAS TAGS! APROXIME QUALQUER CARTA DO CELULAR!!!");
-                    }
-
-                    else if(recebeDados() == 4){
-                        speechMyText("LER DESCRIÇÃO! APROXIME A CARTA DO CELULAR!!!");
-                    }
-                    else if(recebeDados() == 5){
-                        speechMyText("LER REGRAS! APROXIME QUALQUER CARTA DO CELULAR!!!");
-                    }
+//                    if(recebeDados() == 1){
+//                        speechMyText("LER NOME! APROXIME A CARTA DO CELULAR!!!");
+//                    }
+//
+//                    else if(recebeDados() == 2){
+//                        speechMyText("CADASTRAR TAGS! APROXIME A CARTA DO CELULAR!!!");
+//                    }
+//
+//                    else if(recebeDados() == 3){
+//                        speechMyText("APAGAR DADOS DAS TAGS! APROXIME QUALQUER CARTA DO CELULAR!!!");
+//                    }
+//
+//                    else if(recebeDados() == 4){
+//                        speechMyText("LER DESCRIÇÃO! APROXIME A CARTA DO CELULAR!!!");
+//                    }
+//                    else if(recebeDados() == 5){
+//                        speechMyText("LER REGRAS! APROXIME QUALQUER CARTA DO CELULAR!!!");
+//                    }
 
                 }
             }
@@ -630,8 +640,6 @@ public class ReadCardActivity extends AppCompatActivity {
     private void speechMyText(String texto){
         textToSpeech.speak(texto,TextToSpeech.QUEUE_FLUSH,null,null);
     }
-
-
 
     /********************************* CICLO DE VIDA DA ACTIVITY ********************************************/
     @Override
@@ -644,14 +652,14 @@ public class ReadCardActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         disableForegroundDispatchSystem();
-        textToSpeech.stop();
+        //textToSpeech.stop();
         Log.i(TAG,"onPause");
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        textToSpeech.stop();
+        salvarDadosUltimaCartaLida("");
         Log.i(TAG,"onDestroy");
         super.onDestroy();
     }
@@ -668,5 +676,36 @@ public class ReadCardActivity extends AppCompatActivity {
             }
         }
     }
+
+
+    /*Recebe os dados passados pela Activity de ReadCardActivity*/
+    private int recebeDados(){
+
+        Bundle extra = getIntent().getExtras();
+
+        int dados;
+
+        if(extra != null){
+            dados = extra.getInt("mDados");
+            Log.i(TAG,"RECEBE_DADOS: "+dados);
+            return dados;
+        }
+        return 0;
+    }
+
+//    private String recebeDadosIdCsv(){
+//
+//        Bundle extra = getIntent().getExtras();
+//
+//        String idCsv;
+//
+//        if(extra != null){
+//            idCsv = extra.getString("idCsv");
+//            Log.i(TAG,"RECEBE_DADOS: "+idCsv);
+//            return idCsv;
+//        }else{
+//            return "erro";
+//        }
+//    }
 
 }

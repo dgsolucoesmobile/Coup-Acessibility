@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.dgsm.acessibilitycoup">
+    package="com.dgsm.accessibilitycoup">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -24,8 +24,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activity.ReadCard" />
-        <activity android:name=".Activity.MenuActivity">
+        <activity android:name=".Activity.NewMenuActivityOficial">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
@@ -33,9 +32,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.RegisterCardActivity" />
-        <activity android:name=".Activity.Info" />
-        <activity android:name=".ReadCardActivity"></activity>
+        <activity android:name=".Activity.InfoActivity">
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Activity.ReadCardActivity" />
     </application>
 
-</manifest>
+</manifest> <!-- <activity android:name=".Activity.NewMenuActivityOficial"></activity> -->

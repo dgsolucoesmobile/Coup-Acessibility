@@ -1,4 +1,4 @@
-package com.dgsm.acessibilitycoup;
+package com.dgsm.accessibilitycoup;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

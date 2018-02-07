@@ -1,6 +1,5 @@
-package com.dgsm.acessibilitycoup.Activity;
+package com.dgsm.accessibilitycoup.Activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.os.Build;
@@ -15,11 +14,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
-import com.dgsm.acessibilitycoup.R;
-import com.dgsm.acessibilitycoup.ReadCardActivity;
+import com.dgsm.accessibilitycoup.R;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Locale;
 
 public class MenuActivity extends AppCompatActivity {
