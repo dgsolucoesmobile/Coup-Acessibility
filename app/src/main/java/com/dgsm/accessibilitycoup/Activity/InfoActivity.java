@@ -47,7 +47,6 @@ public class InfoActivity extends AppCompatActivity {
 
     //NFC e TextToSpeech
     private NfcAdapter mNfcAdapter;
-    private TextToSpeech textToSpeech;
 
     /*Variável do Arquivo gerado do SharedPreferences*/
     private static final String ARQUIVO_CARTAS = "ArquivoCartas";
@@ -307,8 +306,6 @@ public class InfoActivity extends AppCompatActivity {
         card = deck.getCard(idCsv);
         nameCard = card.getName();
         N("A carta lida foi: "+nameCard);
-        //Log.i(TAG,"A carta lida foi: "+nameCard);
-        //startActivity(new Intent(this,InfoActivity.class));
     }
 
     /*Recupera a descrição da carta do CSV*/
@@ -316,16 +313,7 @@ public class InfoActivity extends AppCompatActivity {
         card = deck.getCard(idCsv);
         descriptionCard = card.getDescription();
         N(descriptionCard);
-        //speechMyText(descriptionCard);
-//        if(!textToSpeech.isSpeaking())
-//            startActivity(new Intent(this,InfoActivity.class));
     }
-
-//    private void enviaDados(String idCsv){
-//        Intent intent = new Intent(this, InfoActivity.class);
-//        intent.putExtra("idCsv",idCsv);
-//        startActivity(intent);
-//    }
 
     /*Nome das Cartas*/
     public void readNameCard(String id){
@@ -395,36 +383,39 @@ public class InfoActivity extends AppCompatActivity {
             recuperaDescricaoCartaCSV("1");
         }
 
-        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
+        else if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
             Log.i(TAG,"mAssassino: "+id);
             //N("Assassino");
             recuperaDescricaoCartaCSV("2");
         }
 
-        if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
+        else if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
             Log.i(TAG,"mCondessa: "+id);
             //N("Condessa");
             recuperaDescricaoCartaCSV("3");
         }
 
 
-        if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
+        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
             Log.i(TAG,"mCapitao: "+id);
             //N("Capitão");
             recuperaDescricaoCartaCSV("4");
         }
 
 
-        if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
+        else if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
             Log.i(TAG,"mEmbaixador: "+id);
             //N("Embaixador");
             recuperaDescricaoCartaCSV("5");
         }
 
-        else if (id.equals("")){
+        else if(id.equals("")){
             N("LEIA UMA CARTA ANTES");
-        }else{
+        }
+
+        else{
             alertDialogCadastrar(id);
+            Log.i(TAG,"id vale: "+id);
         }
     }
 
@@ -439,27 +430,27 @@ public class InfoActivity extends AppCompatActivity {
             recuperaDescricaoCartaCSV("6");
         }
 
-        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
+        else if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
             Log.i(TAG,"mAssassino: "+id);
             //N("Assassino");
             recuperaDescricaoCartaCSV("7");
         }
 
-        if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
+        else if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
             Log.i(TAG,"mCondessa: "+id);
             //N("Condessa");
             recuperaDescricaoCartaCSV("8");
         }
 
 
-        if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
+        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
             Log.i(TAG,"mCapitao: "+id);
             //N("Capitão");
             recuperaDescricaoCartaCSV("9");
         }
 
 
-        if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
+        else if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
             Log.i(TAG,"mEmbaixador: "+id);
             //N("Embaixador");
             recuperaDescricaoCartaCSV("10");
@@ -493,7 +484,6 @@ public class InfoActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("idUltimaCarta", idUltimaCarta);
         editor.commit();
-        //N("Carta "+nome+" cadastrada com sucesso!");
         Log.i(TAG,"\n\nid da última carta SALVA foi: "+idUltimaCarta);
     }
 
@@ -527,17 +517,6 @@ public class InfoActivity extends AppCompatActivity {
     }
 
     /************************************* MÉTODOS DA TAG NFC ***********************************************/
-    private void checkPermissionNFC(){
-
-        Log.i(TAG,"Entrou nas permissões!");
-
-        if (ActivityCompat.checkSelfPermission(this,NFC_SERVICE) != PackageManager.PERMISSION_GRANTED){
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)){
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
-            }else
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
-        }
-    }
 
     public void verificaNFC(){
 
@@ -605,42 +584,6 @@ public class InfoActivity extends AppCompatActivity {
     }
 
 
-    /**************************************** TEXT TO SPEECH *************************************************/
-    public void verificaTTS(){
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status){
-                if (status != TextToSpeech.ERROR){
-                    textToSpeech.setLanguage(Locale.getDefault());
-//                    if(recebeDados() == 1){
-//                        speechMyText("LER NOME! APROXIME A CARTA DO CELULAR!!!");
-//                    }
-//
-//                    else if(recebeDados() == 2){
-//                        speechMyText("CADASTRAR TAGS! APROXIME A CARTA DO CELULAR!!!");
-//                    }
-//
-//                    else if(recebeDados() == 3){
-//                        speechMyText("APAGAR DADOS DAS TAGS! APROXIME QUALQUER CARTA DO CELULAR!!!");
-//                    }
-//
-//                    else if(recebeDados() == 4){
-//                        speechMyText("LER DESCRIÇÃO! APROXIME A CARTA DO CELULAR!!!");
-//                    }
-//                    else if(recebeDados() == 5){
-//                        speechMyText("LER REGRAS! APROXIME QUALQUER CARTA DO CELULAR!!!");
-//                    }
-
-                }
-            }
-        });
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void speechMyText(String texto){
-        textToSpeech.speak(texto,TextToSpeech.QUEUE_FLUSH,null,null);
-    }
-
     /********************************* CICLO DE VIDA DA ACTIVITY ********************************************/
     @Override
     protected void onResume() {
@@ -652,7 +595,6 @@ public class InfoActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         disableForegroundDispatchSystem();
-        //textToSpeech.stop();
         Log.i(TAG,"onPause");
         super.onPause();
     }
@@ -676,36 +618,5 @@ public class InfoActivity extends AppCompatActivity {
             }
         }
     }
-
-
-    /*Recebe os dados passados pela Activity de ReadCardActivity*/
-    private int recebeDados(){
-
-        Bundle extra = getIntent().getExtras();
-
-        int dados;
-
-        if(extra != null){
-            dados = extra.getInt("mDados");
-            Log.i(TAG,"RECEBE_DADOS: "+dados);
-            return dados;
-        }
-        return 0;
-    }
-
-//    private String recebeDadosIdCsv(){
-//
-//        Bundle extra = getIntent().getExtras();
-//
-//        String idCsv;
-//
-//        if(extra != null){
-//            idCsv = extra.getString("idCsv");
-//            Log.i(TAG,"RECEBE_DADOS: "+idCsv);
-//            return idCsv;
-//        }else{
-//            return "erro";
-//        }
-//    }
 
 }

@@ -1,21 +1,18 @@
 package com.dgsm.accessibilitycoup.Activity;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.icu.text.IDNA;
 import android.nfc.NfcAdapter;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,8 +26,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.dgsm.accessibilitycoup.R;
-
-import java.util.Locale;
 
 import tardigrade.Tardigrade;
 import tardigrade.deck.ICard;
@@ -47,7 +42,6 @@ public class NewMenuActivityOficial extends AppCompatActivity {
 
     //NFC e TextToSpeech
     private NfcAdapter mNfcAdapter;
-    private TextToSpeech textToSpeech;
 
     /*Variável do Arquivo gerado do SharedPreferences*/
     private static final String ARQUIVO_CARTAS = "ArquivoCartas";
@@ -94,11 +88,6 @@ public class NewMenuActivityOficial extends AppCompatActivity {
 
         //Verifica o NFC e TTS
         verificaNFC();
-        verificaTTS();
-
-        N("APROXIME A CARTA DO CELULAR A QUALQUER MOMENTO PARA FAZER A LEITURA!");
-
-        //setTitleActivity(recebeDados());
 
         btJogar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -308,21 +297,6 @@ public class NewMenuActivityOficial extends AppCompatActivity {
         startActivity(new Intent(this,InfoActivity.class));
     }
 
-    /*Recupera a descrição da carta do CSV*/
-    private void recuperaDescricaoCartaCSV(String idCsv){
-        card = deck.getCard(idCsv);
-        descriptionCard = card.getDescription();
-        speechMyText(descriptionCard);
-//        if(!textToSpeech.isSpeaking())
-//            startActivity(new Intent(this,InfoActivity.class));
-    }
-
-//    private void enviaDados(String idCsv){
-//        Intent intent = new Intent(this, InfoActivity.class);
-//        intent.putExtra("idCsv",idCsv);
-//        startActivity(intent);
-//    }
-
     /*Nome das Cartas*/
     public void readNameCard(String id){
 
@@ -366,81 +340,6 @@ public class NewMenuActivityOficial extends AppCompatActivity {
 
     }
 
-    /*Descrição das Cartas*/
-    public void readDescription(String id){
-
-        recuperaDadosParaVariaveis();
-
-        if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
-            Log.i(TAG,"mDuque: "+id);
-            //N("Duque");
-            recuperaDescricaoCartaCSV("1");
-        }
-
-        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
-            Log.i(TAG,"mAssassino: "+id);
-            //N("Assassino");
-            recuperaDescricaoCartaCSV("2");
-        }
-
-        if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
-            Log.i(TAG,"mCondessa: "+id);
-            //N("Condessa");
-            recuperaDescricaoCartaCSV("3");
-        }
-
-
-        if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
-            Log.i(TAG,"mCapitao: "+id);
-            //N("Capitão");
-            recuperaDescricaoCartaCSV("4");
-        }
-
-
-        if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
-            Log.i(TAG,"mEmbaixador: "+id);
-            //N("Embaixador");
-            recuperaDescricaoCartaCSV("5");
-        }
-    }
-
-    /*Descrição das Cartas*/
-    public void readDescriptionDetailed(String id){
-
-        recuperaDadosParaVariaveis();
-
-        if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
-            Log.i(TAG,"mDuque: "+id);
-            //N("Duque");
-            recuperaDescricaoCartaCSV("6");
-        }
-
-        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
-            Log.i(TAG,"mAssassino: "+id);
-            //N("Assassino");
-            recuperaDescricaoCartaCSV("7");
-        }
-
-        if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
-            Log.i(TAG,"mCondessa: "+id);
-            //N("Condessa");
-            recuperaDescricaoCartaCSV("8");
-        }
-
-
-        if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
-            Log.i(TAG,"mCapitao: "+id);
-            //N("Capitão");
-            recuperaDescricaoCartaCSV("9");
-        }
-
-
-        if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
-            Log.i(TAG,"mEmbaixador: "+id);
-            //N("Embaixador");
-            recuperaDescricaoCartaCSV("10");
-        }
-    }
 
     /************************************** SHARED PREFERENCES *********************************************/
     private void salvarDados(String nome,String nomeCarta, String tagCarta){
@@ -463,7 +362,6 @@ public class NewMenuActivityOficial extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("idUltimaCarta", idUltimaCarta);
         editor.commit();
-        //N("Carta "+nome+" cadastrada com sucesso!");
         Log.i(TAG,"id da última carta SALVA foi: "+idUltimaCarta);
     }
 
@@ -521,7 +419,7 @@ public class NewMenuActivityOficial extends AppCompatActivity {
         }
 
         if((!mNfcAdapter.isEnabled())){
-            N("Ative o NFC do seu dispositivo para continuar!");
+            N("Ative o NFC do seu dispositivo! Após ativá-lo aproxime a carta do celular a qualquer momento para fazer a leitura");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
                 startActivity(intent);
@@ -532,8 +430,10 @@ public class NewMenuActivityOficial extends AppCompatActivity {
             Log.i(TAG,"Pede para ativar o NFC!");
         }
 
-        else
+        else {
             Log.i(TAG,"O NFC já está ativado!");
+            N("APROXIME A CARTA DO CELULAR A QUALQUER MOMENTO PARA FAZER A LEITURA!");
+        }
     }
 
     /*Lê o ID da TAG*/
@@ -575,43 +475,6 @@ public class NewMenuActivityOficial extends AppCompatActivity {
         mNfcAdapter.disableForegroundDispatch(this);
     }
 
-
-    /**************************************** TEXT TO SPEECH *************************************************/
-    public void verificaTTS(){
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status){
-                if (status != TextToSpeech.ERROR){
-                    textToSpeech.setLanguage(Locale.getDefault());
-//                    if(recebeDados() == 1){
-//                        speechMyText("LER NOME! APROXIME A CARTA DO CELULAR!!!");
-//                    }
-//
-//                    else if(recebeDados() == 2){
-//                        speechMyText("CADASTRAR TAGS! APROXIME A CARTA DO CELULAR!!!");
-//                    }
-//
-//                    else if(recebeDados() == 3){
-//                        speechMyText("APAGAR DADOS DAS TAGS! APROXIME QUALQUER CARTA DO CELULAR!!!");
-//                    }
-//
-//                    else if(recebeDados() == 4){
-//                        speechMyText("LER DESCRIÇÃO! APROXIME A CARTA DO CELULAR!!!");
-//                    }
-//                    else if(recebeDados() == 5){
-//                        speechMyText("LER REGRAS! APROXIME QUALQUER CARTA DO CELULAR!!!");
-//                    }
-
-                }
-            }
-        });
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void speechMyText(String texto){
-        textToSpeech.speak(texto,TextToSpeech.QUEUE_FLUSH,null,null);
-    }
-
     /********************************* CICLO DE VIDA DA ACTIVITY ********************************************/
     @Override
     protected void onResume() {
@@ -623,14 +486,12 @@ public class NewMenuActivityOficial extends AppCompatActivity {
     @Override
     protected void onPause() {
         disableForegroundDispatchSystem();
-        textToSpeech.stop();
         Log.i(TAG,"onPause");
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        textToSpeech.stop();
         Log.i(TAG,"onDestroy");
         super.onDestroy();
     }
