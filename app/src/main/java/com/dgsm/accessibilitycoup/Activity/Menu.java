@@ -1,7 +1,6 @@
 package com.dgsm.accessibilitycoup.Activity;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,7 +10,6 @@ import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,25 +23,22 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.dgsm.accessibilitycoup.R;
-
-import java.util.Locale;
 
 import tardigrade.Tardigrade;
 import tardigrade.deck.ICard;
 import tardigrade.resources.impl.Deck;
 
-public class InfoActivity extends AppCompatActivity {
+public class Menu extends AppCompatActivity {
 
-    private static final String TAG = "InfoActivity";
-    private Button btNome, btDescricao, btDetalhes;
-
+    static final String TAG = "Menu";
     private Tardigrade game;
     private Deck deck = null;
 
-    /*Componente botão*/
-    private Button btVoltar;
+    Toast toast;
+    LayoutInflater inflater;
 
     //NFC e TextToSpeech
     private NfcAdapter mNfcAdapter;
@@ -63,92 +58,104 @@ public class InfoActivity extends AppCompatActivity {
     private String[] mCondessa   = new String[3];
     private String[] mCapitao    = new String[3];
     private String[] mEmbaixador = new String[3];
+    //private String[] mInquisidor = new String[3];
 
-    CharSequence[] values = {" Duque ", " Assassino ", " Condessa ",
-            " Capitão ", " Embaixador "};
+    CharSequence[] values = {" Assassino ", " Capitão ", " Condessa ", " Duque ",
+             " Embaixador "};
 
-    int[] mContador = new int[5];
+    int[] mContador = new int[7];
 
-    String idUltimaCarta;
+    private Button btJogar;
+    private Button btApagarDados;
 
-    Toast toast;
-    LayoutInflater inflater;
+    /*Importando Classes*/
+    Utilitarios utilitarios;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        //utilitarios = new Utilitarios();
+        //utilitarios.fullScreen(getBaseContext());
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_info);
+        setContentView(R.layout.activity_menu);
 
-        setTitle("Tela ler informações das Cartas");
-        mCasts();
         game = Tardigrade.getInstance(this);
         deck = Deck.getInstance(this);
         toast = new Toast(this);
         inflater = getLayoutInflater();
+        setTitle("Menu Principal");
+        /*Cast dos Botões*/
+        mCasts();
+        //utilitarios = new Utilitarios();
 
+        /*Checa se tem permissão para usar o NFC*/
+        checkPermissionNFC();
+
+        //Verifica o NFC e TTS
         verificaNFC();
 
-        btNome.setOnClickListener(new View.OnClickListener() {
+        btJogar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                readNameCard(recuperarDados("idUltimaCarta"));
+                startActivity(new Intent(Menu.this, ReadCard.class));
             }
         });
 
-        btDescricao.setOnClickListener(new View.OnClickListener() {
+        btApagarDados.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                readDescription(recuperarDados("idUltimaCarta"));
-            }
-        });
-
-        btDetalhes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                readDescriptionDetailed(recuperarDados("idUltimaCarta"));
+                //alertDeletaDados();
+                alertDeletaDados();
             }
         });
 
     }
 
-    private void mCasts(){
-        Log.i(TAG,"mCasts");
-        btNome = findViewById(R.id.btNome);
-        btDescricao = findViewById(R.id.btDescricao);
-        btDetalhes = findViewById(R.id.btDetalhes);
+    /*Confirma se o usuário realmente deseja apagar todos os dados*/
+    private void alertDeletaDados(){
+        new MaterialDialog.Builder(this)
+                .title("TELA DE CONFIRMAÇÃO!\n\nClique em SIM se você realmente deseja apagar todas as suas cartas!")
+                .positiveText("SIM")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        limpaTodosDadosSharedPreferences();
+                    }
+                })
+                .negativeText("NÃO")
+                .show();
     }
 
     /*Cadastrar Cartas*/
     private void alertDialogCadastrar(final String id){
         new MaterialDialog.Builder(this)
-                .title("Tela de Cadastro!\nSelecione a carta que deseja atribuir a TAG!")
+                .title("Tela de Cadastro!\n\nSelecione a carta que deseja atribuir a TAG!")
                 .items(values)
                 .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int myItem, CharSequence text) {
 
                         switch (myItem) {
-                            case 0: {
+
+                            case 0:{
                                 switch (mContador[0]) {
                                     case 0: {
-                                        Log.i(TAG, "Duque 1");
-                                        salvarDados("Duque","duque1", id);
+                                        Log.i(TAG, "Assassino 1");
+                                        salvarDados("Assassino","assassino1", id);
                                         mContador[0]++;
                                         break;
                                     }
                                     case 1: {
-                                        Log.i(TAG, "Duque 2");
-                                        salvarDados("Duque","duque2", id);
+                                        Log.i(TAG, "Assassino 2");
+                                        salvarDados("Assassino","assassino2", id);
                                         mContador[0]++;
                                         break;
                                     }
                                     case 2: {
-                                        Log.i(TAG, "Duque 3");
-                                        salvarDados("Duque","duque3", id);
+                                        Log.i(TAG, "Assassino 3");
+                                        salvarDados("Assassino","assassino3", id);
                                         mContador[0]++;
                                         break;
                                     }
@@ -157,23 +164,23 @@ public class InfoActivity extends AppCompatActivity {
                                 break;
                             }
 
-                            case 1:{
+                            case 1:{//Capitão
                                 switch (mContador[1]) {
                                     case 0: {
-                                        Log.i(TAG, "Assassino 1");
-                                        salvarDados("Assassino","assassino1", id);
+                                        Log.i(TAG, "Capitão 1");
+                                        salvarDados("Capitão","capitao1", id);
                                         mContador[1]++;
                                         break;
                                     }
                                     case 1: {
-                                        Log.i(TAG, "Assassino 2");
-                                        salvarDados("Assassino","assassino2", id);
+                                        Log.i(TAG, "Capitão 2");
+                                        salvarDados("Capitão","capitao2", id);
                                         mContador[1]++;
                                         break;
                                     }
                                     case 2: {
-                                        Log.i(TAG, "Assassino 3");
-                                        salvarDados("Assassino","assassino3", id);
+                                        Log.i(TAG, "Capitão 3");
+                                        salvarDados("Capitão","capitao3", id);
                                         mContador[1]++;
                                         break;
                                     }
@@ -207,23 +214,23 @@ public class InfoActivity extends AppCompatActivity {
                                 break;
                             }
 
-                            case 3:{//Capitão
+                            case 3: {
                                 switch (mContador[3]) {
                                     case 0: {
-                                        Log.i(TAG, "Capitão 1");
-                                        salvarDados("Capitão","capitao1", id);
+                                        Log.i(TAG, "Duque 1");
+                                        salvarDados("Duque","duque1", id);
                                         mContador[3]++;
                                         break;
                                     }
                                     case 1: {
-                                        Log.i(TAG, "Capitão 2");
-                                        salvarDados("Capitão","capitao2", id);
+                                        Log.i(TAG, "Duque 2");
+                                        salvarDados("Duque","duque2", id);
                                         mContador[3]++;
                                         break;
                                     }
                                     case 2: {
-                                        Log.i(TAG, "Capitão 3");
-                                        salvarDados("Capitão","capitao3", id);
+                                        Log.i(TAG, "Duque 3");
+                                        salvarDados("Duque","duque3", id);
                                         mContador[3]++;
                                         break;
                                     }
@@ -256,6 +263,31 @@ public class InfoActivity extends AppCompatActivity {
                                 }
                                 break;
                             }
+
+                            /*case 5:{
+                                switch (mContador[5]){
+                                    case 0: {
+                                        Log.i(TAG, "Inquisidor 1");
+                                        salvarDados("Inquisidor","inquisidor1", id);
+                                        mContador[5]++;
+                                        break;
+                                    }
+                                    case 1: {
+                                        Log.i(TAG, "Inquisidor 2");
+                                        salvarDados("Inquisidor","inquisidor2", id);
+                                        mContador[5]++;
+                                        break;
+                                    }
+                                    case 2: {
+                                        Log.i(TAG, "Inquisidor 3");
+                                        salvarDados("Inquisidor","inquisidor3", id);
+                                        mContador[5]++;
+                                        break;
+                                    }
+                                    default: mContador[5] = 0;
+                                break;
+                                }
+                            }*/
                         }
 
                         return true;
@@ -265,8 +297,14 @@ public class InfoActivity extends AppCompatActivity {
                 .show();
     }
 
+    /*Cast dos Botões*/
+    private void mCasts(){
+        btJogar = findViewById(R.id.btJogar);
+        btApagarDados = findViewById(R.id.btApagarDados);
+    }
+
     /*Mostra Mensagens Toast*/
-    public void N(final String message){
+    public void mToasts(final String message){
         View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
         TextView myText = layout.findViewById(R.id.text);
         myText.setText(message);
@@ -278,41 +316,39 @@ public class InfoActivity extends AppCompatActivity {
 
     /*Recupera as informações do SharedPreferences para as Variáveis*/
     private void recuperaDadosParaVariaveis() {
-        mDuque[0] = recuperarDados("duque1");
-        mDuque[1] = recuperarDados("duque2");
-        mDuque[2] = recuperarDados("duque3");
 
         mAssassino[0] = recuperarDados("assassino1");
         mAssassino[1] = recuperarDados("assassino2");
         mAssassino[2] = recuperarDados("assassino3");
 
+        mCapitao[0] = recuperarDados("capitao1");
+        mCapitao[1] = recuperarDados("capitao2");
+        mCapitao[2] = recuperarDados("capitao3");
+
         mCondessa[0] = recuperarDados("condessa1");
         mCondessa[1] = recuperarDados("condessa2");
         mCondessa[2] = recuperarDados("condessa3");
 
-        mCapitao[0] = recuperarDados("capitao1");
-        mCapitao[1] = recuperarDados("capitao2");
-        mCapitao[2] = recuperarDados("capitao3");
+        mDuque[0] = recuperarDados("duque1");
+        mDuque[1] = recuperarDados("duque2");
+        mDuque[2] = recuperarDados("duque3");
 
         mEmbaixador[0] = recuperarDados("embaixador1");
         mEmbaixador[1] = recuperarDados("embaixador2");
         mEmbaixador[2] = recuperarDados("embaixador3");
 
-        idUltimaCarta = recuperarDados("idUltimaCarta");
+//        mInquisidor[0] = recuperarDados("inquisidor1");
+//        mInquisidor[1] = recuperarDados("inquisidor2");
+//        mInquisidor[2] = recuperarDados("inquisidor3");
     }
 
     /*Recupera o nome da carta do CSV*/
     private void recuperaNomeCartaCSV(String idCsv){
         card = deck.getCard(idCsv);
         nameCard = card.getName();
-        N("A carta lida foi: "+nameCard);
-    }
-
-    /*Recupera a descrição da carta do CSV*/
-    private void recuperaDescricaoCartaCSV(String idCsv){
-        card = deck.getCard(idCsv);
-        descriptionCard = card.getDescription();
-        N(descriptionCard);
+        mToasts(nameCard);
+        Log.i(TAG,"A carta lida foi: "+nameCard);
+        startActivity(new Intent(this,ReadCard.class));
     }
 
     /*Nome das Cartas*/
@@ -320,19 +356,14 @@ public class InfoActivity extends AppCompatActivity {
 
         recuperaDadosParaVariaveis();
 
-        Log.i(TAG,"\n\nÚltimo ID lido: "+id);
-        Log.i(TAG,"mDuque[0]: "+mDuque[0]);
-        Log.i(TAG,"mDuque[1]: "+mDuque[1]);
-        Log.i(TAG,"mDuque[2]: "+mDuque[2]);
-
-        if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
-            Log.i(TAG,"mDuque: "+id);
+        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
+            Log.i(TAG,"mAssassino: "+id);
             recuperaNomeCartaCSV("1");
             salvarDadosUltimaCartaLida(id);
         }
 
-        else if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
-            Log.i(TAG,"mAssassino: "+id);
+        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
+            Log.i(TAG,"mCapitao: "+id);
             recuperaNomeCartaCSV("2");
             salvarDadosUltimaCartaLida(id);
         }
@@ -343,13 +374,11 @@ public class InfoActivity extends AppCompatActivity {
             salvarDadosUltimaCartaLida(id);
         }
 
-
-        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
-            Log.i(TAG,"mCapitao: "+id);
+        else if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
+            Log.i(TAG,"mDuque: "+id);
             recuperaNomeCartaCSV("4");
             salvarDadosUltimaCartaLida(id);
         }
-
 
         else if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
             Log.i(TAG,"mEmbaixador: "+id);
@@ -357,111 +386,18 @@ public class InfoActivity extends AppCompatActivity {
             salvarDadosUltimaCartaLida(id);
         }
 
-        else if (id.equals("")){
-            N("LEIA UMA CARTA ANTES");
-        }else{
-            alertDialogCadastrar(id);
-        }
-
-    }
-
-    /*Descrição das Cartas*/
-    public void readDescription(String id){
-
-        recuperaDadosParaVariaveis();
-
-        Log.i(TAG,"\n\nReadDescription: ");
-        Log.i(TAG,"Último ID lido: "+id);
-        Log.i(TAG,"mDuque[0]: "+mDuque[0]);
-        Log.i(TAG,"mDuque[1]: "+mDuque[1]);
-        Log.i(TAG,"mDuque[2]: "+mDuque[2]);
-
-
-        if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
-            Log.i(TAG,"mDuque: "+id);
-            //N("Duque");
-            recuperaDescricaoCartaCSV("1");
-        }
-
-        else if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
-            Log.i(TAG,"mAssassino: "+id);
-            //N("Assassino");
-            recuperaDescricaoCartaCSV("2");
-        }
-
-        else if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
-            Log.i(TAG,"mCondessa: "+id);
-            //N("Condessa");
-            recuperaDescricaoCartaCSV("3");
-        }
-
-
-        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
-            Log.i(TAG,"mCapitao: "+id);
-            //N("Capitão");
-            recuperaDescricaoCartaCSV("4");
-        }
-
-
-        else if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
-            Log.i(TAG,"mEmbaixador: "+id);
-            //N("Embaixador");
-            recuperaDescricaoCartaCSV("5");
-        }
-
-        else if(id.equals("")){
-            N("LEIA UMA CARTA ANTES");
-        }
+        /*else if (mInquisidor[0].equals(id) || mInquisidor[1].equals(id) || mInquisidor[2].equals(id)){
+            Log.i(TAG, "mInquisidor"+id);
+            recuperaNomeCartaCSV("6");
+            salvarDadosUltimaCartaLida(id);
+        }*/
 
         else{
             alertDialogCadastrar(id);
-            Log.i(TAG,"id vale: "+id);
         }
+
     }
 
-    /*Descrição das Cartas*/
-    public void readDescriptionDetailed(String id){
-
-        recuperaDadosParaVariaveis();
-
-        if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
-            Log.i(TAG,"mDuque: "+id);
-            //N("Duque");
-            recuperaDescricaoCartaCSV("6");
-        }
-
-        else if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
-            Log.i(TAG,"mAssassino: "+id);
-            //N("Assassino");
-            recuperaDescricaoCartaCSV("7");
-        }
-
-        else if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
-            Log.i(TAG,"mCondessa: "+id);
-            //N("Condessa");
-            recuperaDescricaoCartaCSV("8");
-        }
-
-
-        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
-            Log.i(TAG,"mCapitao: "+id);
-            //N("Capitão");
-            recuperaDescricaoCartaCSV("9");
-        }
-
-
-        else if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
-            Log.i(TAG,"mEmbaixador: "+id);
-            //N("Embaixador");
-            recuperaDescricaoCartaCSV("10");
-        }
-
-        else if (id.equals("")){
-            N("LEIA UMA CARTA ANTES");
-        }else{
-            alertDialogCadastrar(id);
-        }
-    }
 
     /************************************** SHARED PREFERENCES *********************************************/
     private void salvarDados(String nome,String nomeCarta, String tagCarta){
@@ -472,19 +408,19 @@ public class InfoActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(nomeCarta, tagCarta);
         editor.commit();
-        N("Carta "+nome+" cadastrada com sucesso!");
-        Log.i(TAG,"\n\nNome Carta: "+nomeCarta+"\tTAG ID: "+tagCarta);
+        mToasts("Carta "+nome+" cadastrada com sucesso!");
+        Log.i(TAG,"Nome Carta: "+nomeCarta+"\tTAG ID: "+tagCarta);
     }
 
     private void salvarDadosUltimaCartaLida(String idUltimaCarta){
 
-        limpaDadoCartaEspecifica("idUltimaCarta");
+        limpaDadosUltimaCartaLida(idUltimaCarta);
 
         SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("idUltimaCarta", idUltimaCarta);
         editor.commit();
-        Log.i(TAG,"\n\nid da última carta SALVA foi: "+idUltimaCarta);
+        Log.i(TAG,"id da última carta SALVA foi: "+idUltimaCarta);
     }
 
     private String recuperarDados(String nameCard){
@@ -496,7 +432,6 @@ public class InfoActivity extends AppCompatActivity {
     private void limpaDadoCartaEspecifica(String removerCarta){
         SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        Log.i(TAG,"\n\nRemoverCarta: "+removerCarta);
         editor.remove(removerCarta);
         editor.commit();
     }
@@ -513,10 +448,22 @@ public class InfoActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
-        N("Dados apagados com sucesso!");
+        mToasts("Dados apagados com sucesso!!!");
+        //startActivity(new Intent(this, ReadCard.class)); //modificar depois
     }
 
     /************************************* MÉTODOS DA TAG NFC ***********************************************/
+    private void checkPermissionNFC(){
+
+        Log.i(TAG,"Entrou nas permissões!");
+
+        if (ActivityCompat.checkSelfPermission(this,NFC_SERVICE) != PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)){
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
+            }else
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
+        }
+    }
 
     public void verificaNFC(){
 
@@ -524,13 +471,14 @@ public class InfoActivity extends AppCompatActivity {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if (mNfcAdapter == null){
-            N("O seu dispositivo não possui NFC!!!");
+            mToasts("O seu dispositivo não possui NFC!");
             finish();
             return;
         }
 
         if((!mNfcAdapter.isEnabled())){
-            N("Ative o NFC do seu dispositivo!");
+            mToasts("Ative o NFC do seu dispositivo! Após ativá-lo aproxime o celular da carta" +
+                    " que deseja ler a qualquer momento.");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
                 startActivity(intent);
@@ -541,8 +489,10 @@ public class InfoActivity extends AppCompatActivity {
             Log.i(TAG,"Pede para ativar o NFC!");
         }
 
-        else
+        else {
             Log.i(TAG,"O NFC já está ativado!");
+            mToasts("APROXIME O CELULAR DA CARTA QUE DESEJA LER A QUALQUER MOMENTO!");
+        }
     }
 
     /*Lê o ID da TAG*/
@@ -572,7 +522,8 @@ public class InfoActivity extends AppCompatActivity {
 
     /*Códigos extras da TAG NFC*/
     private void enableForegroundDispatchSystem(){
-        Intent intent = new Intent(this,InfoActivity.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
+
+        Intent intent = new Intent(this,Menu.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
         IntentFilter[] intentFilters = new IntentFilter[]{};
 
@@ -582,7 +533,6 @@ public class InfoActivity extends AppCompatActivity {
     private void disableForegroundDispatchSystem(){
         mNfcAdapter.disableForegroundDispatch(this);
     }
-
 
     /********************************* CICLO DE VIDA DA ACTIVITY ********************************************/
     @Override
@@ -601,7 +551,6 @@ public class InfoActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        salvarDadosUltimaCartaLida("");
         Log.i(TAG,"onDestroy");
         super.onDestroy();
     }

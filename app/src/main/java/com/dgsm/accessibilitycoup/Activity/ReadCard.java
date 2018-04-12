@@ -1,17 +1,13 @@
 package com.dgsm.accessibilitycoup.Activity;
 
-import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.speech.tts.TextToSpeech;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,107 +27,115 @@ import tardigrade.Tardigrade;
 import tardigrade.deck.ICard;
 import tardigrade.resources.impl.Deck;
 
-public class NewMenuActivityOficial extends AppCompatActivity {
+public class ReadCard extends AppCompatActivity {
 
-    static final String TAG = "NewMenuActivityOficial";
-    private Tardigrade game;
-    private Deck deck = null;
-
-    Toast toast;
-    LayoutInflater inflater;
-
-    //NFC e TextToSpeech
-    private NfcAdapter mNfcAdapter;
-
+    private static final String TAG = "ReadCard";
     /*Variável do Arquivo gerado do SharedPreferences*/
     private static final String ARQUIVO_CARTAS = "ArquivoCartas";
 
-    private ICard card;
-
-    /*Usados para recuperar nome e descrição das cartas, através do CSV*/
-    private String nameCard;
-    private String descriptionCard;
-
-    /*Usados para recuperar os dados do SharedPreferences*/
-    private String[] mDuque      = new String[3];
-    private String[] mAssassino  = new String[3];
-    private String[] mCondessa   = new String[3];
-    private String[] mCapitao    = new String[3];
-    private String[] mEmbaixador = new String[3];
-
-    CharSequence[] values = {" Duque ", " Assassino ", " Condessa ",
-            " Capitão ", " Embaixador "};
+    CharSequence[] values = {" Assassino ", " Capitão ", " Condessa ", " Duque ",
+            " Embaixador "};
 
     int[] mContador = new int[5];
 
-    private Button btJogar;
-    private Button btConfig;
+    String idUltimaCarta;
+    Toast toast;
+    LayoutInflater inflater;
+    private Button btNome, btDescricao, btDetalhes;
+    private Tardigrade game;
+    private Deck deck = null;
+    /*Componente botão*/
+    private Button btVoltar;
+    //NFC e TextToSpeech
+    private NfcAdapter mNfcAdapter;
+    private ICard card;
+    /*Usados para recuperar nome e descrição das cartas, através do CSV*/
+    private String nameCard;
+    private String descriptionCard;
+    private String detailsCard;
+    /*Usados para recuperar os dados do SharedPreferences*/
+    private String[] mDuque = new String[3];
+    private String[] mAssassino = new String[3];
+    private String[] mCondessa = new String[3];
+    private String[] mCapitao = new String[3];
+    private String[] mEmbaixador = new String[3];
+    //private String[] mInquisidor = new String[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_new_menu_oficial);
+        setContentView(R.layout.activity_read_card);
 
+        setTitle("Tela ler informações das Cartas");
+        mCasts();
         game = Tardigrade.getInstance(this);
         deck = Deck.getInstance(this);
         toast = new Toast(this);
         inflater = getLayoutInflater();
-        setTitle("Menu Principal");
-        /*Cast dos Botões*/
-        mCasts();
 
-        /*Checa se tem permissão para usar o NFC*/
-        checkPermissionNFC();
-
-        //Verifica o NFC e TTS
         verificaNFC();
 
-        btJogar.setOnClickListener(new View.OnClickListener() {
+        btNome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(NewMenuActivityOficial.this, InfoActivity.class));
+                readNameCard(recuperarDados("idUltimaCarta"));
             }
         });
 
-        btConfig.setOnClickListener(new View.OnClickListener() {
+        btDescricao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                limpaTodosDadosSharedPreferences();
+                readDescription(recuperarDados("idUltimaCarta"));
+            }
+        });
+
+        btDetalhes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                readDescriptionDetailed(recuperarDados("idUltimaCarta"));
             }
         });
 
     }
 
-    /*Cadastrar Cartas*/
+    private void mCasts() {
+        Log.i(TAG, "mCasts");
+        btNome = findViewById(R.id.btNome);
+        btDescricao = findViewById(R.id.btDescricao);
+        btDetalhes = findViewById(R.id.btDetalhes);
+    }
+
     private void alertDialogCadastrar(final String id){
         new MaterialDialog.Builder(this)
-                .title("Tela de Cadastro!\nSelecione a carta que deseja atribuir a TAG!")
+                .title("Tela de Cadastro!\n\nSelecione a carta que deseja atribuir a TAG!")
                 .items(values)
                 .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int myItem, CharSequence text) {
 
                         switch (myItem) {
-                            case 0: {
+
+                            case 0:{
                                 switch (mContador[0]) {
                                     case 0: {
-                                        Log.i(TAG, "Duque 1");
-                                        salvarDados("Duque","duque1", id);
+                                        Log.i(TAG, "Assassino 1");
+                                        salvarDados("Assassino","assassino1", id);
                                         mContador[0]++;
                                         break;
                                     }
                                     case 1: {
-                                        Log.i(TAG, "Duque 2");
-                                        salvarDados("Duque","duque2", id);
+                                        Log.i(TAG, "Assassino 2");
+                                        salvarDados("Assassino","assassino2", id);
                                         mContador[0]++;
                                         break;
                                     }
                                     case 2: {
-                                        Log.i(TAG, "Duque 3");
-                                        salvarDados("Duque","duque3", id);
+                                        Log.i(TAG, "Assassino 3");
+                                        salvarDados("Assassino","assassino3", id);
                                         mContador[0]++;
                                         break;
                                     }
@@ -140,23 +144,23 @@ public class NewMenuActivityOficial extends AppCompatActivity {
                                 break;
                             }
 
-                            case 1:{
+                            case 1:{//Capitão
                                 switch (mContador[1]) {
                                     case 0: {
-                                        Log.i(TAG, "Assassino 1");
-                                        salvarDados("Assassino","assassino1", id);
+                                        Log.i(TAG, "Capitão 1");
+                                        salvarDados("Capitão","capitao1", id);
                                         mContador[1]++;
                                         break;
                                     }
                                     case 1: {
-                                        Log.i(TAG, "Assassino 2");
-                                        salvarDados("Assassino","assassino2", id);
+                                        Log.i(TAG, "Capitão 2");
+                                        salvarDados("Capitão","capitao2", id);
                                         mContador[1]++;
                                         break;
                                     }
                                     case 2: {
-                                        Log.i(TAG, "Assassino 3");
-                                        salvarDados("Assassino","assassino3", id);
+                                        Log.i(TAG, "Capitão 3");
+                                        salvarDados("Capitão","capitao3", id);
                                         mContador[1]++;
                                         break;
                                     }
@@ -190,23 +194,23 @@ public class NewMenuActivityOficial extends AppCompatActivity {
                                 break;
                             }
 
-                            case 3:{//Capitão
+                            case 3: {
                                 switch (mContador[3]) {
                                     case 0: {
-                                        Log.i(TAG, "Capitão 1");
-                                        salvarDados("Capitão","capitao1", id);
+                                        Log.i(TAG, "Duque 1");
+                                        salvarDados("Duque","duque1", id);
                                         mContador[3]++;
                                         break;
                                     }
                                     case 1: {
-                                        Log.i(TAG, "Capitão 2");
-                                        salvarDados("Capitão","capitao2", id);
+                                        Log.i(TAG, "Duque 2");
+                                        salvarDados("Duque","duque2", id);
                                         mContador[3]++;
                                         break;
                                     }
                                     case 2: {
-                                        Log.i(TAG, "Capitão 3");
-                                        salvarDados("Capitão","capitao3", id);
+                                        Log.i(TAG, "Duque 3");
+                                        salvarDados("Duque","duque3", id);
                                         mContador[3]++;
                                         break;
                                     }
@@ -239,6 +243,31 @@ public class NewMenuActivityOficial extends AppCompatActivity {
                                 }
                                 break;
                             }
+
+//                            case 5:{
+//                                switch (mContador[5]){
+//                                    case 0: {
+//                                        Log.i(TAG, "Inquisidor 1");
+//                                        salvarDados("Inquisidor","inquisidor1", id);
+//                                        mContador[5]++;
+//                                        break;
+//                                    }
+//                                    case 1: {
+//                                        Log.i(TAG, "Inquisidor 2");
+//                                        salvarDados("Inquisidor","inquisidor2", id);
+//                                        mContador[5]++;
+//                                        break;
+//                                    }
+//                                    case 2: {
+//                                        Log.i(TAG, "Inquisidor 3");
+//                                        salvarDados("Inquisidor","inquisidor3", id);
+//                                        mContador[5]++;
+//                                        break;
+//                                    }
+//                                    default: mContador[5] = 0;
+//                                        break;
+//                                }
+//                            }
                         }
 
                         return true;
@@ -248,19 +277,13 @@ public class NewMenuActivityOficial extends AppCompatActivity {
                 .show();
     }
 
-    /*Cast dos Botões*/
-    private void mCasts(){
-        btJogar = findViewById(R.id.btJogar);
-        btConfig = findViewById(R.id.btConfigurar);
-    }
-
     /*Mostra Mensagens Toast*/
-    public void N(final String message){
+    public void N(final String message) {
         View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
         TextView myText = layout.findViewById(R.id.text);
         myText.setText(message);
         toast.setView(layout);
-        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER,0,100);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER, 0, 100);
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.show();
     }
@@ -286,30 +309,53 @@ public class NewMenuActivityOficial extends AppCompatActivity {
         mEmbaixador[0] = recuperarDados("embaixador1");
         mEmbaixador[1] = recuperarDados("embaixador2");
         mEmbaixador[2] = recuperarDados("embaixador3");
+
+//        mInquisidor[0] = recuperarDados("inquisidor1");
+//        mInquisidor[1] = recuperarDados("inquisidor2");
+//        mInquisidor[2] = recuperarDados("inquisidor3");
+
+        idUltimaCarta = recuperarDados("idUltimaCarta");
     }
 
     /*Recupera o nome da carta do CSV*/
-    private void recuperaNomeCartaCSV(String idCsv){
+    private void recuperaNomeCartaCSV(String idCsv) {
         card = deck.getCard(idCsv);
         nameCard = card.getName();
-        N("A carta lida foi:"+nameCard);
-        Log.i(TAG,"A carta lida foi: "+nameCard);
-        startActivity(new Intent(this,InfoActivity.class));
+        N(nameCard);
+    }
+
+    /*Recupera a descrição da carta do CSV*/
+    private void recuperaDescricaoCartaCSV(String idCsv) {
+        card = deck.getCard(idCsv);
+        descriptionCard = card.getDescription();
+        N(descriptionCard);
+    }
+
+    /*Recupera a descrição da carta do CSV*/
+    private void recuperaDetalhesCartaCSV(String idCsv) {
+        card = deck.getCard(idCsv);
+        detailsCard = card.getDescription();
+        N(detailsCard);
     }
 
     /*Nome das Cartas*/
-    public void readNameCard(String id){
+    public void readNameCard(String id) {
 
         recuperaDadosParaVariaveis();
 
-        if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
-            Log.i(TAG,"mDuque: "+id);
+        Log.i(TAG, "\n\nÚltimo ID lido: " + id);
+        Log.i(TAG, "mDuque[0]: " + mDuque[0]);
+        Log.i(TAG, "mDuque[1]: " + mDuque[1]);
+        Log.i(TAG, "mDuque[2]: " + mDuque[2]);
+
+        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
+            Log.i(TAG,"mAssassino: "+id);
             recuperaNomeCartaCSV("1");
             salvarDadosUltimaCartaLida(id);
         }
 
-        else if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
-            Log.i(TAG,"mAssassino: "+id);
+        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
+            Log.i(TAG,"mCapitao: "+id);
             recuperaNomeCartaCSV("2");
             salvarDadosUltimaCartaLida(id);
         }
@@ -320,13 +366,11 @@ public class NewMenuActivityOficial extends AppCompatActivity {
             salvarDadosUltimaCartaLida(id);
         }
 
-
-        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
-            Log.i(TAG,"mCapitao: "+id);
+        else if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
+            Log.i(TAG,"mDuque: "+id);
             recuperaNomeCartaCSV("4");
             salvarDadosUltimaCartaLida(id);
         }
-
 
         else if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
             Log.i(TAG,"mEmbaixador: "+id);
@@ -334,15 +378,128 @@ public class NewMenuActivityOficial extends AppCompatActivity {
             salvarDadosUltimaCartaLida(id);
         }
 
-        else{
+//        else if (mInquisidor[0].equals(id) || mInquisidor[1].equals(id) || mInquisidor[2].equals(id)){
+//            Log.i(TAG, "mInquisidor"+id);
+//            recuperaNomeCartaCSV("6");
+//            salvarDadosUltimaCartaLida(id);
+//        }
+
+        else if (id.equals("")) {
+            N("LEIA UMA CARTA ANTES");
+        }
+
+        else {
             alertDialogCadastrar(id);
         }
 
     }
 
+    /*Descrição das Cartas*/
+    public void readDescription(String id) {
+
+        recuperaDadosParaVariaveis();
+
+        Log.i(TAG, "\n\nReadDescription: ");
+        Log.i(TAG, "Último ID lido: " + id);
+        Log.i(TAG, "mDuque[0]: " + mDuque[0]);
+        Log.i(TAG, "mDuque[1]: " + mDuque[1]);
+        Log.i(TAG, "mDuque[2]: " + mDuque[2]);
+
+
+        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
+            Log.i(TAG,"mAssassino: "+id);
+            recuperaDescricaoCartaCSV("1");
+        }
+
+        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
+            Log.i(TAG,"mCapitao: "+id);
+            recuperaDescricaoCartaCSV("2");
+        }
+
+        else if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
+            Log.i(TAG,"mCondessa: "+id);
+            recuperaDescricaoCartaCSV("3");
+        }
+
+        else if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
+            Log.i(TAG,"mDuque: "+id);
+            recuperaDescricaoCartaCSV("4");
+        }
+
+        else if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
+            Log.i(TAG,"mEmbaixador: "+id);
+            recuperaDescricaoCartaCSV("5");
+        }
+
+//        else if (mInquisidor[0].equals(id) || mInquisidor[1].equals(id) || mInquisidor[2].equals(id)){
+//            Log.i(TAG, "mInquisidor"+id);
+//            recuperaDescricaoCartaCSV("6");
+//        }
+
+        else if (id.equals("")) {
+            N("LEIA UMA CARTA ANTES");
+        }
+
+        else {
+            alertDialogCadastrar(id);
+            Log.i(TAG, "id vale: " + id);
+        }
+    }
+
+    /*Descrição das Cartas*/
+    public void readDescriptionDetailed(String id) {
+
+        recuperaDadosParaVariaveis();
+
+        Log.i(TAG, "\n\nReadDescription: ");
+        Log.i(TAG, "Último ID lido: " + id);
+        Log.i(TAG, "mDuque[0]: " + mDuque[0]);
+        Log.i(TAG, "mDuque[1]: " + mDuque[1]);
+        Log.i(TAG, "mDuque[2]: " + mDuque[2]);
+
+
+        if (mAssassino[0].equals(id) || mAssassino[1].equals(id) || mAssassino[2].equals(id)){
+            Log.i(TAG,"mAssassino: "+id);
+            recuperaDetalhesCartaCSV("7");
+        }
+
+        else if (mCapitao[0].equals(id) || mCapitao[1].equals(id) || mCapitao[2].equals(id)){
+            Log.i(TAG,"mCapitao: "+id);
+            recuperaDetalhesCartaCSV("8");
+        }
+
+        else if (mCondessa[0].equals(id) || mCondessa[1].equals(id) || mCondessa[2].equals(id)){
+            Log.i(TAG,"mCondessa: "+id);
+            recuperaDetalhesCartaCSV("9");
+        }
+
+        else if (mDuque[0].equals(id) || mDuque[1].equals(id) || mDuque[2].equals(id)){
+            Log.i(TAG,"mDuque: "+id);
+            recuperaDetalhesCartaCSV("10");
+        }
+
+        else if (mEmbaixador[0].equals(id) || mEmbaixador[1].equals(id) || mEmbaixador[2].equals(id)){
+            Log.i(TAG,"mEmbaixador: "+id);
+            recuperaDetalhesCartaCSV("11");
+        }
+
+//        else if (mInquisidor[0].equals(id) || mInquisidor[1].equals(id) || mInquisidor[2].equals(id)){
+//            Log.i(TAG, "mInquisidor"+id);
+//            recuperaDetalhesCartaCSV("12");
+//        }
+
+        else if (id.equals("")) {
+            N("LEIA UMA CARTA ANTES");
+        }
+
+        else {
+            alertDialogCadastrar(id);
+            Log.i(TAG, "id vale: " + id);
+        }
+    }
 
     /************************************** SHARED PREFERENCES *********************************************/
-    private void salvarDados(String nome,String nomeCarta, String tagCarta){
+    private void salvarDados(String nome, String nomeCarta, String tagCarta) {
 
         limpaDadoCartaEspecifica(tagCarta);
 
@@ -350,76 +507,65 @@ public class NewMenuActivityOficial extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(nomeCarta, tagCarta);
         editor.commit();
-        N("Carta "+nome+" cadastrada com sucesso!");
-        Log.i(TAG,"Nome Carta: "+nomeCarta+"\tTAG ID: "+tagCarta);
+        N("Carta " + nome + " cadastrada com sucesso!");
+        Log.i(TAG, "\n\nNome Carta: " + nomeCarta + "\tTAG ID: " + tagCarta);
     }
 
-    private void salvarDadosUltimaCartaLida(String idUltimaCarta){
+    private void salvarDadosUltimaCartaLida(String idUltimaCarta) {
 
-        limpaDadosUltimaCartaLida(idUltimaCarta);
+        limpaDadoCartaEspecifica("idUltimaCarta");
 
         SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("idUltimaCarta", idUltimaCarta);
         editor.commit();
-        Log.i(TAG,"id da última carta SALVA foi: "+idUltimaCarta);
+        Log.i(TAG, "\n\nid da última carta SALVA foi: " + idUltimaCarta);
     }
 
-    private String recuperarDados(String nameCard){
+    private String recuperarDados(String nameCard) {
         SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
-        String cardID = preferences.getString(nameCard,"Carta não cadastrada!");
+        String cardID = preferences.getString(nameCard, "Carta não cadastrada!");
         return cardID;
     }
 
-    private void limpaDadoCartaEspecifica(String removerCarta){
+    private void limpaDadoCartaEspecifica(String removerCarta) {
         SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
+        Log.i(TAG, "\n\nRemoverCarta: " + removerCarta);
         editor.remove(removerCarta);
         editor.commit();
     }
 
-    private void limpaDadosUltimaCartaLida(String idUltimaCarta){
+    private void limpaDadosUltimaCartaLida(String idUltimaCarta) {
         SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.remove(idUltimaCarta);
         editor.commit();
     }
 
-    public void limpaTodosDadosSharedPreferences(){
+    public void limpaTodosDadosSharedPreferences() {
         SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
-        N("Dados apagados com sucesso!!!");
-        //startActivity(new Intent(this, InfoActivity.class)); //modificar depois
+        N("Dados apagados com sucesso!");
     }
 
     /************************************* MÉTODOS DA TAG NFC ***********************************************/
-    private void checkPermissionNFC(){
 
-        Log.i(TAG,"Entrou nas permissões!");
-
-        if (ActivityCompat.checkSelfPermission(this,NFC_SERVICE) != PackageManager.PERMISSION_GRANTED){
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)){
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
-            }else
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
-        }
-    }
-
-    public void verificaNFC(){
+    public void verificaNFC() {
 
         //Check for available NFC Adapter
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
-        if (mNfcAdapter == null){
-            N("O seu dispositivo não possui NFC!");
+        if (mNfcAdapter == null) {
+            N("O seu dispositivo não possui NFC!!!");
             finish();
             return;
         }
 
-        if((!mNfcAdapter.isEnabled())){
-            N("Ative o NFC do seu dispositivo! Após ativá-lo aproxime a carta do celular a qualquer momento para fazer a leitura");
+        if ((!mNfcAdapter.isEnabled())) {
+            N("Ative o NFC do seu dispositivo!");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
                 startActivity(intent);
@@ -427,31 +573,26 @@ public class NewMenuActivityOficial extends AppCompatActivity {
                 Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
                 startActivity(intent);
             }
-            Log.i(TAG,"Pede para ativar o NFC!");
-        }
-
-        else {
-            Log.i(TAG,"O NFC já está ativado!");
-            N("APROXIME A CARTA DO CELULAR A QUALQUER MOMENTO PARA FAZER A LEITURA!");
-        }
+            Log.i(TAG, "Pede para ativar o NFC!");
+        } else
+            Log.i(TAG, "O NFC já está ativado!");
     }
 
     /*Lê o ID da TAG*/
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.i(TAG,"Carta lida");
+        Log.i(TAG, "Carta lida");
         String tagContentID = ByteArrayToHexString(intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)).toString();
         readNameCard(tagContentID);
     }
 
     /*Converte o ID da TAG de Hexadecimal para Decimal*/
-    private String ByteArrayToHexString(byte [] inarray) {
+    private String ByteArrayToHexString(byte[] inarray) {
         int i, j, in;
-        String [] hex = {"0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"};
-        String out= "";
+        String[] hex = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
+        String out = "";
 
-        for(j = 0 ; j < inarray.length ; ++j)
-        {
+        for (j = 0; j < inarray.length; ++j) {
             in = (int) inarray[j] & 0xff;
             i = (in >> 4) & 0x0f;
             out += hex[i];
@@ -462,37 +603,38 @@ public class NewMenuActivityOficial extends AppCompatActivity {
     }
 
     /*Códigos extras da TAG NFC*/
-    private void enableForegroundDispatchSystem(){
-
-        Intent intent = new Intent(this,NewMenuActivityOficial.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+    private void enableForegroundDispatchSystem() {
+        Intent intent = new Intent(this, ReadCard.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         IntentFilter[] intentFilters = new IntentFilter[]{};
 
-        mNfcAdapter.enableForegroundDispatch(this,pendingIntent,intentFilters,null);
+        mNfcAdapter.enableForegroundDispatch(this, pendingIntent, intentFilters, null);
     }
 
-    private void disableForegroundDispatchSystem(){
+    private void disableForegroundDispatchSystem() {
         mNfcAdapter.disableForegroundDispatch(this);
     }
+
 
     /********************************* CICLO DE VIDA DA ACTIVITY ********************************************/
     @Override
     protected void onResume() {
         enableForegroundDispatchSystem();
-        Log.i(TAG,"onResume");
+        Log.i(TAG, "onResume");
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         disableForegroundDispatchSystem();
-        Log.i(TAG,"onPause");
+        Log.i(TAG, "onPause");
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        Log.i(TAG,"onDestroy");
+        salvarDadosUltimaCartaLida("");
+        Log.i(TAG, "onDestroy");
         super.onDestroy();
     }
 
@@ -500,8 +642,8 @@ public class NewMenuActivityOficial extends AppCompatActivity {
     /******************************************** TARDIGRADE ***********************************************/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == 0){
-            if (resultCode == RESULT_OK){
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
                 String result = intent.getStringExtra("SCAN_RESULT");
                 ICard card = deck.getCard(result);
                 card.execute();

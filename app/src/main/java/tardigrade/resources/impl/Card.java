@@ -31,6 +31,7 @@ public class Card implements ICard {
     public String getName() { return name; }
     @Override
     public void   setName(String name) { this.name = name; }
+
     @Override
     public String getDescription() { return description; }
 
@@ -46,6 +47,7 @@ public class Card implements ICard {
 
     @Override
     public void   setDescription(String description) { this.description = description; }
+
 
     @Override
     public void execute() {

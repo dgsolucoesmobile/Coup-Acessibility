@@ -256,7 +256,7 @@ public class Deck extends SQLiteOpenHelper implements IDeck {
                 if(Tardigrade.CARD_ATTRIBUTES != null) {
                     attr = new String[Tardigrade.CARD_ATTRIBUTES.length];
 
-                    for (int i = 3; i < 3 + Tardigrade.CARD_ATTRIBUTES.length ; i++){
+                    for (int i = 3; i < 4 + Tardigrade.CARD_ATTRIBUTES.length ; i++){
                         attr[i-3] = row[i];
                     }
                 }

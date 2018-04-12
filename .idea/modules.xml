@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Tardigrade-master.iml" filepath="$PROJECT_DIR$/Tardigrade-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Coup_Oficial.iml" filepath="$PROJECT_DIR$/Coup_Oficial.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

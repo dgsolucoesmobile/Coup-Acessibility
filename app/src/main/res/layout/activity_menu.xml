@@ -1,55 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/colorBackgrounLayout"
-    tools:context="com.dgsm.accessibilitycoup.Activity.MenuActivity">
+    android:orientation="vertical"
+    tools:context="com.dgsm.accessibilitycoup.Activity.ReadCard"
+    tools:layout_editor_absoluteY="81dp">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btJogar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="15dp"
+        android:layout_weight="2"
+        android:background="@color/colorBackgroundButton"
+        android:text="@string/jogar"
+        android:textColor="@color/colorTextButton"
+        android:autoSizeMinTextSize="50sp"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:padding="15dp"
+        android:autoSizeTextType="uniform"
+        app:layout_constraintBottom_toTopOf="@+id/btDescricao"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:id="@+id/btJogar"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="@dimen/margin"
-            android:layout_marginRight="@dimen/margin"
-            android:background="@color/colorBackgroundButton"
-            android:text="@string/jogar"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:textSize="50dp"/>
+    <Button
+        android:id="@+id/btApagarDados"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="9dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_weight="2"
+        android:background="@color/colorBackgroundButton"
+        android:text="@string/apagar_dados"
+        android:textColor="@color/colorTextButton"
+        android:autoSizeMinTextSize="50sp"
+        android:textStyle="bold"
+        android:autoSizeTextType="uniform"
+        android:padding="15dp"
+        android:textSize="50sp"
+        app:layout_constraintBottom_toTopOf="@+id/btDetalhes"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btNome" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:id="@+id/btCadastrar"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="@dimen/margin"
-            android:layout_marginRight="@dimen/margin"
-            android:background="@color/colorBackgroundButton"
-            android:text="CADASTRAR CARTAS"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:textSize="40dp"/>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:id="@+id/btApagar"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="@dimen/margin"
-            android:layout_marginRight="@dimen/margin"
-            android:background="@color/colorBackgroundButton"
-            android:text="APAGAR DADOS DAS CARTAS"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:textSize="40dp"/>
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

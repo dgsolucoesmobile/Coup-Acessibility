@@ -18,4 +18,8 @@
         O último jogador a possuir uma carta ainda virada para baixo — vence o jogo!</string>
     <string name="jogar">JOGAR</string>
     <string name="voltar">VOLTAR</string>
+    <string name="apagar_dados">APAGAR DADOS</string>
+    <string name="nome">NOME</string>
+    <string name="descricao">Descrição</string>
+    <string name="detalhes">Detalhes</string>
 </resources>

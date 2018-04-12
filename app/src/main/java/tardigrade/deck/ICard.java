@@ -10,7 +10,7 @@ public interface ICard {
 	void setDescription(String description);
 	String getDescription();
 
-    void setAttributeByName(String name, Object value);
+	void setAttributeByName(String name, Object value);
 	Object getAttributeByName(String name);
 
     void execute();

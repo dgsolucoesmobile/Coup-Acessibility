@@ -44,7 +44,7 @@ public class GameTardigrade extends Tardigrade {
 
             shuffle(ids, 0);
             shuffle(roles, 8 - ids.size());
-            roles.add(Card.Create("0", "Espião", "Descubra onde seus amigos estão", null));
+            roles.add(Card.Create("0", "Espião", "Descubra onde seus amigos estão",null));
             shuffle(roles, 0);
 
             for(int i=0; i< ids.size(); i++){
