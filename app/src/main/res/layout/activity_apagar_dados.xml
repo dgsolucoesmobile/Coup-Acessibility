@@ -21,7 +21,6 @@
         android:background="@color/colorBackgroundButton"
         android:padding="15dp"
         android:text="@string/voltar"
-        android:contentDescription="@string/voltar"
         android:textColor="@color/colorTextButton"
         android:textSize="50sp"
         android:textStyle="bold"

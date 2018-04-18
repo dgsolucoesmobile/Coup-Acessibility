@@ -310,27 +310,27 @@ public class Menu extends AppCompatActivity {
         //recuperaDadosParaVariaveis();
 
         if (tagContent.equals("As1")){
-            Log.i(TAG,"mAssassino: "+tagContent);
+            Log.i(TAG,"ReadNameCard: mAssassino: "+tagContent);
             recuperaNomeCartaCSV("1");
         }
 
         else if (tagContent.equals("Cp1")){
-            Log.i(TAG,"mCapitao: "+tagContent);
+            Log.i(TAG,"ReadNameCard: mCapitao: "+tagContent);
             recuperaNomeCartaCSV("2");
         }
 
         else if (tagContent.equals("Cd1")){
-            Log.i(TAG,"mCondessa: "+tagContent);
+            Log.i(TAG,"ReadNameCard: mCondessa: "+tagContent);
             recuperaNomeCartaCSV("3");
         }
 
         else if (tagContent.equals("Dq1")){
-            Log.i(TAG,"mDuque: "+tagContent);
+            Log.i(TAG,"ReadNameCard: mDuque: "+tagContent);
             recuperaNomeCartaCSV("4");
         }
 
         else if (tagContent.equals("Em1")){
-            Log.i(TAG,"mEmbaixador: "+tagContent);
+            Log.i(TAG,"ReadNameCard: mEmbaixador: "+tagContent);
             recuperaNomeCartaCSV("5");
         }
 
@@ -422,7 +422,6 @@ public class Menu extends AppCompatActivity {
 
             if(parcelables != null && parcelables.length > 0){
                 readTextFromMessage((NdefMessage)parcelables[0],tagText);
-                Log.i(TAG, "verificaCadastro: teste******"+(NdefMessage)parcelables[0]);
             }else{
                 Log.i(TAG, "verificaCadastro: Nenhum texto encontrado na TAG");
                 mToasts("Esta carta ainda não está cadastrada!");
@@ -467,7 +466,7 @@ public class Menu extends AppCompatActivity {
             ndefFormatable.close();
 
         }catch (Exception e){
-            Log.i(TAG, "formatTag: "+e.getMessage());
+            Log.i(TAG, "formatTag -----> Erro: "+e.getMessage());
         }
     }
 

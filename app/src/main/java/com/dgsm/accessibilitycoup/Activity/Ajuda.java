@@ -52,35 +52,35 @@ public class Ajuda extends AppCompatActivity {
         btAssassino.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recuperaDescricaoCartaCSV("1");
+                recuperaDescricaoDetalhadaCartaCSV("7");
             }
         });
 
         btCapitao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recuperaDescricaoCartaCSV("2");
+                recuperaDescricaoDetalhadaCartaCSV("8");
             }
         });
 
         btCondessa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recuperaDescricaoCartaCSV("3");
+                recuperaDescricaoDetalhadaCartaCSV("9");
             }
         });
 
         btDuque.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recuperaDescricaoCartaCSV("4");
+                recuperaDescricaoDetalhadaCartaCSV("10");
             }
         });
 
         btEmbaixador.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recuperaDescricaoCartaCSV("5");
+                recuperaDescricaoDetalhadaCartaCSV("11");
             }
         });
 
@@ -109,11 +109,11 @@ public class Ajuda extends AppCompatActivity {
     }
 
     /*Recupera a descrição da carta do CSV*/
-    private void recuperaDescricaoCartaCSV(String idCsv) {
+    private void recuperaDescricaoDetalhadaCartaCSV(String idCsv) {
         card = deck.getCard(idCsv);
         descriptionCard = card.getDescription();
         mToasts(descriptionCard);
-        Log.i(TAG, "recuperaDescricaoCartaCSV: leu a descrição da carta"+idCsv);
+        Log.i(TAG, "recuperaDescricaoDetalhadaCartaCSV: leu a descrição da carta"+idCsv);
     }
 
     /*Mostra Mensagens Toast*/
