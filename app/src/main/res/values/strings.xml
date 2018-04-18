@@ -16,10 +16,29 @@
         Se você tiver o personagem em questão e escolher revelá-lo, o oponente perde uma carta,
         você embaralha o seu personagem revelado no baralho central e pega uma nova carta, podendo ser o mesmo personagem ou não.
         O último jogador a possuir uma carta ainda virada para baixo — vence o jogo!</string>
+
     <string name="jogar">JOGAR</string>
+    <string name="ajuda">AJUDA</string>
     <string name="voltar">VOLTAR</string>
     <string name="apagar_dados">APAGAR DADOS</string>
     <string name="nome">NOME</string>
     <string name="descricao">Descrição</string>
     <string name="detalhes">Detalhes</string>
+
+    <!--Nome das Cartas-->
+    <string name="assassino">Assassino</string>
+    <string name="capitao">Capitão</string>
+    <string name="condessa">Condessa</string>
+    <string name="duque">Duque</string>
+    <string name="embaixador">Embaixador</string>
+
+    <!--Textos guias para o usuário-->
+    <string name="manter_fim_cadastro">Mantenha o celular próximo da carta até o fim do cadastro!</string>
+
+    <!--Título das Activities-->
+    <string name="menu_activity">Tela de menu principal</string>
+    <string name="readCard_activity">Tela ler informação das cartas</string>
+    <string name="apagarDados_activity">Tela de apagar dados</string>
+    <string name="ajuda_activity">Tela de ajuda</string>
+
 </resources>

@@ -24,16 +24,28 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!--Activity Menu-->
         <activity
             android:name=".Activity.Menu"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--Apagar Dados-->
+        <activity
+            android:name=".Activity.ApagarDados"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+            </intent-filter>
+        </activity>
+
+        <!--ReadCard-->
         <activity
             android:name=".Activity.ReadCard"
             android:screenOrientation="portrait">
@@ -41,7 +53,15 @@
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.Utilitarios"></activity>
+
+        <!--Utilitarios-->
+        <activity android:name=".Activity.Utilitarios"
+            android:screenOrientation="portrait"/>
+
+        <!--Ajuda-->
+        <activity android:name=".Activity.Ajuda"
+            android:screenOrientation="portrait"></activity>
+
     </application>
 
 </manifest> <!-- <activity android:name=".ActivMenucial"></activity> -->

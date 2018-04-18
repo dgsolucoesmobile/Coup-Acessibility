@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -29,6 +30,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.dgsm.accessibilitycoup.R;
 
@@ -39,36 +41,29 @@ import tardigrade.Tardigrade;
 import tardigrade.deck.ICard;
 import tardigrade.resources.impl.Deck;
 
-public class Menu extends AppCompatActivity {
+public class ApagarDados extends AppCompatActivity {
 
-    static final String TAG = "Menu";
+    static final String TAG = "ApagarDados";
+    private NfcAdapter mNfcAdapter;
+    Toast toast;
+    LayoutInflater inflater;
 
     /*Tardigrade*/
     private Tardigrade game;
     private Deck deck = null;
     private ICard card;
 
-    /*Toast Customizavel*/
-    Toast toast;
-    LayoutInflater inflater;
-
-    //NFC
-    private NfcAdapter mNfcAdapter;
-
-    /*Variável do Arquivo gerado do SharedPreferences*/
-    private static final String ARQUIVO_CARTAS = "ArquivoCartas";
-
     /*Usados para recuperar nome e descrição das cartas, através do CSV*/
     private String nameCard;
     private String descriptionCard;
 
-    public CharSequence[] personagensCartas = {" Assassino ", " Capitão ", " Condessa ", " Duque ", " Embaixador "};
+    CharSequence[] personagensCartas = {" Assassino ", " Capitão ", " Condessa ", " Duque ", " Embaixador "};
+    CharSequence[] apagarItens = {"Apagar carta"};
 
-    public int[] mContador = new int[7];
+    private static final String ARQUIVO_CARTAS = "ArquivoCartas";
+    int[] mContador = new int[7];
 
-    private Button btJogar;
-    private Button btApagarDados;
-    private Button btAjuda;
+    private Button btVoltar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,46 +72,155 @@ public class Menu extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_menu);
+        setContentView(R.layout.activity_apagar_dados);
 
-        /*Cast dos Botões*/
-        mCasts();
+        game = Tardigrade.getInstance(this);
+        deck = Deck.getInstance(this);
+        toast = new Toast(this);
+        inflater = getLayoutInflater();
 
-        /*Checa se tem permissão para usar o NFC*/
-        checkPermissionNFC();
 
-        //Verifica o NFC
+        setTitle("Tela de Apagar Dados");
+
         verificaNFC();
 
-        btJogar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(Menu.this, ReadCard.class));
-            }
-        });
+        btVoltar = findViewById(R.id.btVoltar);
 
-        btApagarDados.setOnClickListener(new View.OnClickListener() {
+        btVoltar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               startActivity(new Intent(Menu.this,ApagarDados.class));
-            }
-        });
-
-        btAjuda.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mToasts("Entenda a ação de cada carta!");
-                startActivity(new Intent(Menu.this, Ajuda.class));
-                //alertAjuda();
+                startActivity(new Intent(ApagarDados.this, Menu.class));
             }
         });
 
     }
 
+    /*Mostra Mensagens Toast*/
+    public void mToasts(final String message){
+        View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
+        TextView myText = layout.findViewById(R.id.text);
+        myText.setText(message);
+        toast.setView(layout);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER,0,100);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    /************************************* MÉTODOS DA TAG NFC ***********************************************/
+    private void checkPermissionNFC(){
+
+        Log.i(TAG,"Entrou nas permissões!");
+
+        if (ActivityCompat.checkSelfPermission(this,NFC_SERVICE) != PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)){
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
+            }else
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
+        }
+    }
+
+    public void verificaNFC(){
+
+        //Check for available NFC Adapter
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+        if (mNfcAdapter == null){
+            mToasts("O seu dispositivo não possui NFC!");
+            finish();
+            return;
+        }
+
+        if((!mNfcAdapter.isEnabled())){
+            mToasts("Ative o NFC do seu dispositivo! E aproxime o celular da carta" +
+                    " que deseja ler");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+                startActivity(intent);
+            }
+            Log.i(TAG,"Pede para ativar o NFC!");
+        }
+
+        else {
+            Log.i(TAG,"O NFC já está ativado!");
+            mToasts("APROXIME O CELULAR DA CARTA QUE DESEJA LER");
+        }
+    }
+
+    /*Lê o ID da TAG*/
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.i(TAG,"Carta lida");
+        Tag tagText = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+        /*Cadastrar texto na Tag*/
+        verificaCadastro(intent,tagText);
+    }
+
+    public void verificaCadastro(Intent intent,Tag tagText){
+
+        /*Se tiver algum texto*/
+        if(intent.hasExtra(NfcAdapter.EXTRA_TAG)){
+
+            Log.i(TAG, "verificaCadastro: Existe Texto Gravado na Tag");
+
+            Parcelable[] parcelables = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+
+            if(parcelables != null && parcelables.length > 0){
+                readTextFromMessage((NdefMessage)parcelables[0],tagText);
+            }else{
+                Log.i(TAG, "verificaCadastro: Nenhum texto encontrado na TAG");
+                mToasts("Esta carta ainda não está cadastrada!");
+                alertDialogCadastrar(tagText);
+            }
+        }
+
+
+    }
+
+    private void apagarCartas(final Tag tagText) {
+
+        mToasts("Mantenha o celular próximo da carta até o fim do processo!");
+
+        new MaterialDialog.Builder(this)
+                .title("TELA DE CONFIRMAÇÃO!")
+                .items(apagarItens)
+                .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, View view, int myItem, CharSequence text) {
+
+                        switch (myItem){
+                            case 0:{
+                                Log.i(TAG, "onSelection: Apagar Carta.");
+                                escreverTag(tagText,"clear");
+                                mToasts("Carta apagada com sucesso!");
+                                limpaTodosDadosSharedPreferences();
+                                break;
+                            }
+                        }
+                        //startActivity(new Intent(ApagarDados.this, Menu.class));
+                        return true;
+                    }
+                })
+
+                .negativeText("Cancelar")
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                        mToasts("Ação cancelada com sucesso!");
+                        startActivity(new Intent(ApagarDados.this, Menu.class));
+                    }
+                })
+                .show();
+    }
+
     /*Cadastrar Cartas*/
     private void alertDialogCadastrar(final Tag tagText){
 
-        mToasts("Mantenha o celular próximo da carta até o fim do cadastro!");
+        mToasts(String.valueOf(R.string.manter_fim_cadastro));
 
         new MaterialDialog.Builder(this)
                 .title("Tela de Cadastro!\n\nSelecione a carta que deseja cadastrar!")
@@ -264,46 +368,6 @@ public class Menu extends AppCompatActivity {
                 .show();
     }
 
-    private void escreverTag(Tag tag,String message){
-        NdefMessage ndefMessage = createNdefMessage(message);
-        writeNdefMessage(tag,ndefMessage);
-        Log.i(TAG, "escreverTag: Escrita na TAG com sucesso!"+tag);
-    }
-
-    /*Cast dos Botões*/
-    private void mCasts(){
-
-        game = Tardigrade.getInstance(this);
-        deck = Deck.getInstance(this);
-        toast = new Toast(this);
-        inflater = getLayoutInflater();
-        setTitle(R.string.menu_activity);
-
-        btJogar = findViewById(R.id.btAssassino);
-        btApagarDados = findViewById(R.id.btCapitao);
-        btAjuda = findViewById(R.id.btCondessa);
-    }
-
-    /*Mostra Mensagens Toast*/
-    public void mToasts(final String message){
-        View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
-        TextView myText = layout.findViewById(R.id.text);
-        myText.setText(message);
-        toast.setView(layout);
-        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER,0,100);
-        toast.setDuration(Toast.LENGTH_SHORT);
-        toast.show();
-    }
-
-    /*Recupera o nome da carta do CSV*/
-    private void recuperaNomeCartaCSV(String idCsv){
-        card = deck.getCard(idCsv);
-        nameCard = card.getName();
-        mToasts(nameCard);
-        Log.i(TAG,"A carta lida foi: "+nameCard);
-        startActivity(new Intent(this,ReadCard.class));
-    }
-
     /*Nome das Cartas*/
     public void readNameCard(String tagContent){
 
@@ -338,99 +402,19 @@ public class Menu extends AppCompatActivity {
 
     }
 
-
-    /************************************** SHARED PREFERENCES *********************************************/
-    private void salvarDadosUltimaCartaLida(String idUltimaCarta){
-
-        limpaDadosUltimaCartaLida(idUltimaCarta);
-
-        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("idUltimaCarta", idUltimaCarta);
-        editor.commit();
-        Log.i(TAG,"id da última carta SALVA foi: "+idUltimaCarta);
+    /*Recupera o nome da carta do CSV*/
+    private void recuperaNomeCartaCSV(String idCsv){
+        card = deck.getCard(idCsv);
+        nameCard = card.getName();
+        mToasts(nameCard);
+        Log.i(TAG,"A carta lida foi: "+nameCard);
+        startActivity(new Intent(this,ReadCard.class));
     }
 
-    private void limpaDadosUltimaCartaLida(String idUltimaCarta){
-        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.remove(idUltimaCarta);
-        editor.commit();
-    }
-
-    /************************************* MÉTODOS DA TAG NFC ***********************************************/
-    private void checkPermissionNFC(){
-
-        Log.i(TAG,"Entrou nas permissões!");
-
-        if (ActivityCompat.checkSelfPermission(this,NFC_SERVICE) != PackageManager.PERMISSION_GRANTED){
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)){
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
-            }else
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.NFC},0);
-        }
-    }
-
-    public void verificaNFC(){
-
-        //Check for available NFC Adapter
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-
-        if (mNfcAdapter == null){
-            mToasts("O seu dispositivo não possui NFC!");
-            finish();
-            return;
-        }
-
-        if((!mNfcAdapter.isEnabled())){
-            mToasts("Ative o NFC do seu dispositivo! E aproxime o celular da carta" +
-                    " que deseja ler.");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
-                startActivity(intent);
-            } else {
-                Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
-                startActivity(intent);
-            }
-            Log.i(TAG,"Pede para ativar o NFC!");
-        }
-
-        else {
-            Log.i(TAG,"O NFC já está ativado!");
-            mToasts("APROXIME O CELULAR DA CARTA QUE DESEJA LER!");
-        }
-    }
-
-    /*Lê o ID da TAG*/
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        Log.i(TAG,"Carta lida");
-        Tag tagText = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-
-        /*Cadastrar texto na Tag*/
-        verificaCadastro(intent,tagText);
-    }
-
-    public void verificaCadastro(Intent intent,Tag tagText){
-
-        /*Se tiver algum texto*/
-        if(intent.hasExtra(NfcAdapter.EXTRA_TAG)){
-
-            Log.i(TAG, "verificaCadastro: Existe Texto Gravado na Tag");
-
-            Parcelable[] parcelables = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-
-            if(parcelables != null && parcelables.length > 0){
-                readTextFromMessage((NdefMessage)parcelables[0],tagText);
-                Log.i(TAG, "verificaCadastro: teste******"+(NdefMessage)parcelables[0]);
-            }else{
-                Log.i(TAG, "verificaCadastro: Nenhum texto encontrado na TAG");
-                mToasts("Esta carta ainda não está cadastrada!");
-                alertDialogCadastrar(tagText);
-            }
-        }
-
-
+    private void escreverTag(Tag tag,String message){
+        NdefMessage ndefMessage = createNdefMessage(message);
+        writeNdefMessage(tag,ndefMessage);
+        Log.i(TAG, "escreverTag: Escrita na TAG com sucesso!"+tag);
     }
 
     private void readTextFromMessage(NdefMessage ndefMessage,Tag tagText){
@@ -441,15 +425,11 @@ public class Menu extends AppCompatActivity {
             NdefRecord ndefRecord = ndefRecords[0];
             String tagContent = getTextFromNdefRecord(ndefRecord);
 
-            if(tagContent.equals("As1") || tagContent.equals("Cp1") || tagContent.equals("Cd1") || tagContent.equals("Dq1") || tagContent.equals("Em1")){
-                readNameCard(tagContent);
-                Log.i(TAG, "readTextFromMessage: Tag já cadastrada - "+tagContent);
-            }else{
-                alertDialogCadastrar(tagText);
-                Log.i(TAG, "readTextFromMessage: Tag ainda não cadastrada ---> "+tagText);
-            }
+            apagarCartas(tagText);
+            Log.i(TAG, "readTextFromMessage: Tag apagada com sucesso!");
         }else{
-            Log.i(TAG, "readTextFromMessage: Nenhuma mensagem encontrada ---> ");
+            Log.i(TAG, "readTextFromMessage: Tag ainda não cadastrada");
+            alertDialogCadastrar(tagText);
         }
 
     }
@@ -486,7 +466,7 @@ public class Menu extends AppCompatActivity {
             }else{
                 ndef.connect();
 
-                if(!ndef.isWritable()) {
+                if(!ndef.isWritable()){
                     Log.i(TAG, "writeNdefMessage: Não é possível gravar nesta TAG, use outra.");
                     mToasts("Esta TAG está protegida contra gravação. Porfavor use outra.");
                     ndef.close();
@@ -495,10 +475,8 @@ public class Menu extends AppCompatActivity {
 
                 ndef.writeNdefMessage(ndefMessage);
                 ndef.close();
+
                 mToasts("Carta cadastrada com sucesso!");
-
-
-
             }
 
         }catch (Exception e){
@@ -577,7 +555,7 @@ public class Menu extends AppCompatActivity {
     /*Códigos extras da TAG NFC*/
     private void enableForegroundDispatchSystem(){
 
-        Intent intent = new Intent(this,Menu.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
+        Intent intent = new Intent(this,ApagarDados.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
         IntentFilter[] intentFilters = new IntentFilter[]{};
 
@@ -587,6 +565,34 @@ public class Menu extends AppCompatActivity {
     private void disableForegroundDispatchSystem(){
         mNfcAdapter.disableForegroundDispatch(this);
     }
+
+
+    public void limpaTodosDadosSharedPreferences(){
+        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
+        mToasts("Dados apagados com sucesso!!!");
+        //startActivity(new Intent(this, ReadCard.class)); //modificar depois
+    }
+    private void salvarDadosUltimaCartaLida(String idUltimaCarta){
+
+        limpaDadosUltimaCartaLida(idUltimaCarta);
+
+        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("idUltimaCarta", idUltimaCarta);
+        editor.commit();
+        Log.i(TAG,"id da última carta SALVA foi: "+idUltimaCarta);
+    }
+
+    private void limpaDadosUltimaCartaLida(String idUltimaCarta){
+        SharedPreferences preferences = getSharedPreferences(ARQUIVO_CARTAS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(idUltimaCarta);
+        editor.commit();
+    }
+
 
     /********************************* CICLO DE VIDA DA ACTIVITY ********************************************/
     @Override
@@ -609,17 +615,5 @@ public class Menu extends AppCompatActivity {
         super.onDestroy();
     }
 
-
-    /******************************************** TARDIGRADE ***********************************************/
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == 0){
-            if (resultCode == RESULT_OK){
-                String result = intent.getStringExtra("SCAN_RESULT");
-                ICard card = deck.getCard(result);
-                card.execute();
-            }
-        }
-    }
 
 }
