@@ -57,9 +57,6 @@ public class ApagarDados extends AppCompatActivity {
     private String nameCard;
     private String descriptionCard;
 
-    CharSequence[] personagensCartas = {" Assassino ", " Capitão ", " Condessa ", " Duque ", " Embaixador "};
-    CharSequence[] apagarItens = {"Apagar carta"};
-
     private static final String ARQUIVO_CARTAS = "ArquivoCartas";
     int[] mContador = new int[7];
 
@@ -79,8 +76,8 @@ public class ApagarDados extends AppCompatActivity {
         toast = new Toast(this);
         inflater = getLayoutInflater();
 
-
-        setTitle("Tela de Apagar Dados");
+        String titulo = String.valueOf(R.string.tela_apagar_dados);
+        setTitle(Integer.parseInt(titulo));
 
         verificaNFC();
 
@@ -96,7 +93,20 @@ public class ApagarDados extends AppCompatActivity {
     }
 
     /*Mostra Mensagens Toast*/
-    public void mToasts(final String message){
+    public void mToasts(final int messageInt){
+        //String message = Integer.parseInt(messageInt);
+        View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
+        TextView myText = layout.findViewById(R.id.text);
+        myText.setText(Integer.parseInt(String.valueOf(messageInt)));
+        toast.setView(layout);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER,0,100);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    /*Mostra Mensagens Toast*/
+    public void mToastsText(final String message){
+        //String message = Integer.parseInt(messageInt);
         View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
         TextView myText = layout.findViewById(R.id.text);
         myText.setText(message);
@@ -125,14 +135,13 @@ public class ApagarDados extends AppCompatActivity {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if (mNfcAdapter == null){
-            mToasts("O seu dispositivo não possui NFC!");
+            mToasts((R.string.seu_dispositivo_nao_possui_nfc));
             finish();
             return;
         }
 
         if((!mNfcAdapter.isEnabled())){
-            mToasts("Ative o NFC do seu dispositivo! E aproxime o celular da carta" +
-                    " que deseja ler");
+            mToasts((R.string.ative_o_nfc));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
                 startActivity(intent);
@@ -145,7 +154,7 @@ public class ApagarDados extends AppCompatActivity {
 
         else {
             Log.i(TAG,"O NFC já está ativado!");
-            mToasts("APROXIME O CELULAR DA CARTA QUE DESEJA LER");
+            mToasts((R.string.aproxime_da_carta));
         }
     }
 
@@ -172,7 +181,7 @@ public class ApagarDados extends AppCompatActivity {
                 readTextFromMessage((NdefMessage)parcelables[0],tagText);
             }else{
                 Log.i(TAG, "verificaCadastro: Nenhum texto encontrado na TAG");
-                mToasts("Esta carta ainda não está cadastrada!");
+                mToasts((R.string.carta_nao_cadastrada));
                 alertDialogCadastrar(tagText);
             }
         }
@@ -182,10 +191,13 @@ public class ApagarDados extends AppCompatActivity {
 
     private void apagarCartas(final Tag tagText) {
 
-        mToasts("Mantenha o celular próximo da carta até o fim do processo!");
+        mToasts((R.string.mantenha_celular_proximo_carta));
+
+        String[] apagarItens = {
+                getString(R.string.apagar_carta)};
 
         new MaterialDialog.Builder(this)
-                .title("TELA DE CONFIRMAÇÃO!")
+                .title(R.string.tela_confirmacao)
                 .items(apagarItens)
                 .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
@@ -195,7 +207,7 @@ public class ApagarDados extends AppCompatActivity {
                             case 0:{
                                 Log.i(TAG, "onSelection: Apagar Carta.");
                                 escreverTag(tagText,"clear");
-                                mToasts("Carta apagada com sucesso!");
+                                mToasts((R.string.carta_apagada));
                                 limpaTodosDadosSharedPreferences();
                                 break;
                             }
@@ -210,7 +222,7 @@ public class ApagarDados extends AppCompatActivity {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
-                        mToasts("Ação cancelada com sucesso!");
+                        mToasts((R.string.acao_cancelada));
                         startActivity(new Intent(ApagarDados.this, Menu.class));
                     }
                 })
@@ -220,10 +232,15 @@ public class ApagarDados extends AppCompatActivity {
     /*Cadastrar Cartas*/
     private void alertDialogCadastrar(final Tag tagText){
 
-        mToasts(String.valueOf(R.string.manter_fim_cadastro));
+        mToasts((R.string.manter_fim_cadastro));
+
+        String[] personagensCartas = {
+                getString(R.string.assassino), getString(R.string.capitao),
+                getString(R.string.condessa), getString(R.string.duque),
+                getString(R.string.embaixador)};
 
         new MaterialDialog.Builder(this)
-                .title("Tela de Cadastro!\n\nSelecione a carta que deseja cadastrar!")
+                .title(R.string.tela_cadastro_selecione_carta)
                 .items(personagensCartas)
                 .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
@@ -248,7 +265,7 @@ public class ApagarDados extends AppCompatActivity {
                                         Log.i(TAG, "Assassino 3");
                                         escreverTag(tagText,"As1");
                                         mContador[0]++;
-                                        mToasts("Todas as cartas Assassino já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_assassino));
                                         break;
                                     }
                                     default: mContador[0] = 0;
@@ -273,7 +290,7 @@ public class ApagarDados extends AppCompatActivity {
                                     case 2: {
                                         Log.i(TAG, "Capitão 3");
                                         escreverTag(tagText,"Cp1");
-                                        mToasts("Todas as cartas Capitão já foram cadastradas!");
+                                        mToasts((R.string.todas_carta_capitao));
                                         mContador[1]++;
                                         break;
                                     }
@@ -300,7 +317,7 @@ public class ApagarDados extends AppCompatActivity {
                                         Log.i(TAG, "Condessa 3");
                                         escreverTag(tagText,"Cd1");
                                         mContador[2]++;
-                                        mToasts("Todas as cartas Condessa já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_condessa));
                                         break;
                                     }
                                     default: mContador[2] = 0;
@@ -326,7 +343,7 @@ public class ApagarDados extends AppCompatActivity {
                                         Log.i(TAG, "Duque 3");
                                         escreverTag(tagText,"Dq1");
                                         mContador[3]++;
-                                        mToasts("Todas as cartas Duque já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_duque));
                                         break;
                                     }
                                     default: mContador[3] = 0;
@@ -352,7 +369,7 @@ public class ApagarDados extends AppCompatActivity {
                                         Log.i(TAG, "Embaixador 3");
                                         escreverTag(tagText,"Em1");
                                         mContador[4]++;
-                                        mToasts("Todas as cartas Embaixador já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_embaixador));
                                         break;
                                     }
                                     default: mContador[4] = 0;
@@ -406,7 +423,7 @@ public class ApagarDados extends AppCompatActivity {
     private void recuperaNomeCartaCSV(String idCsv){
         card = deck.getCard(idCsv);
         nameCard = card.getName();
-        mToasts(nameCard);
+        mToastsText(nameCard);
         Log.i(TAG,"A carta lida foi: "+nameCard);
         startActivity(new Intent(this,ReadCard.class));
     }
@@ -468,7 +485,7 @@ public class ApagarDados extends AppCompatActivity {
 
                 if(!ndef.isWritable()){
                     Log.i(TAG, "writeNdefMessage: Não é possível gravar nesta TAG, use outra.");
-                    mToasts("Esta TAG está protegida contra gravação. Porfavor use outra.");
+                    mToasts((R.string.tag_protegida_gravacao));
                     ndef.close();
                     return;
                 }
@@ -476,7 +493,7 @@ public class ApagarDados extends AppCompatActivity {
                 ndef.writeNdefMessage(ndefMessage);
                 ndef.close();
 
-                mToasts("Carta cadastrada com sucesso!");
+                mToasts((R.string.carta_cadastrada_sucesso));
             }
 
         }catch (Exception e){
@@ -572,7 +589,7 @@ public class ApagarDados extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
-        mToasts("Dados apagados com sucesso!!!");
+        mToasts((R.string.dados_apagados_sucesso));
         //startActivity(new Intent(this, ReadCard.class)); //modificar depois
     }
     private void salvarDadosUltimaCartaLida(String idUltimaCarta){

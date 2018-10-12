@@ -42,8 +42,6 @@ public class ReadCard extends AppCompatActivity {
     /*Variável do Arquivo gerado do SharedPreferences*/
     private static final String ARQUIVO_CARTAS = "ArquivoCartas";
 
-    CharSequence[] personagensCartas = {" Assassino ", " Capitão ", " Condessa ", " Duque ", " Embaixador "};
-
     int[] mContador = new int[5];
 
     String idUltimaCarta;
@@ -71,6 +69,9 @@ public class ReadCard extends AppCompatActivity {
         setContentView(R.layout.activity_read_card);
 
         mCasts();
+
+        String titulo = String.valueOf(R.string.tela_ler_informacoes_cartas);
+        setTitle(Integer.parseInt(titulo));
 
         verificaNFC();
 
@@ -100,8 +101,6 @@ public class ReadCard extends AppCompatActivity {
     private void mCasts() {
         Log.i(TAG, "mCasts");
 
-        setTitle("Tela ler informações das Cartas");
-
         game = Tardigrade.getInstance(this);
         deck = Deck.getInstance(this);
         toast = new Toast(this);
@@ -115,10 +114,15 @@ public class ReadCard extends AppCompatActivity {
     /*Cadastrar Cartas*/
     private void alertDialogCadastrar(final Tag tagText) {
 
-        mToasts("Mantenha o celular próximo da carta até o fim do cadastro!");
+        mToasts((R.string.mantenha_celular_proximo));
+
+        String[] personagensCartas = {
+                getString(R.string.assassino), getString(R.string.capitao),
+                getString(R.string.condessa), getString(R.string.duque),
+                getString(R.string.embaixador)};
 
         new MaterialDialog.Builder(this)
-                .title("Tela de Cadastro!\n\nSelecione a carta que deseja cadastrar!")
+                .title((R.string.tela_cadastro_selecione_carta))
                 .items(personagensCartas)
                 .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
@@ -143,7 +147,7 @@ public class ReadCard extends AppCompatActivity {
                                         Log.i(TAG, "Assassino 3");
                                         escreverTag(tagText, "As1");
                                         mContador[0]++;
-                                        mToasts("Todas as cartas Assassino já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_assassino));
                                         break;
                                     }
                                     default:
@@ -169,7 +173,7 @@ public class ReadCard extends AppCompatActivity {
                                     case 2: {
                                         Log.i(TAG, "Capitão 3");
                                         escreverTag(tagText, "Cp1");
-                                        mToasts("Todas as cartas Capitão já foram cadastradas!");
+                                        mToasts((R.string.todas_carta_capitao));
                                         mContador[1]++;
                                         break;
                                     }
@@ -197,7 +201,7 @@ public class ReadCard extends AppCompatActivity {
                                         Log.i(TAG, "Condessa 3");
                                         escreverTag(tagText, "Cd1");
                                         mContador[2]++;
-                                        mToasts("Todas as cartas Condessa já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_condessa));
                                         break;
                                     }
                                     default:
@@ -224,7 +228,7 @@ public class ReadCard extends AppCompatActivity {
                                         Log.i(TAG, "Duque 3");
                                         escreverTag(tagText, "Dq1");
                                         mContador[3]++;
-                                        mToasts("Todas as cartas Duque já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_duque));
                                         break;
                                     }
                                     default:
@@ -251,7 +255,7 @@ public class ReadCard extends AppCompatActivity {
                                         Log.i(TAG, "Embaixador 3");
                                         escreverTag(tagText, "Em1");
                                         mContador[4]++;
-                                        mToasts("Todas as cartas Embaixador já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_embaixador));
                                         break;
                                     }
                                     default:
@@ -275,12 +279,25 @@ public class ReadCard extends AppCompatActivity {
     }
 
     /*Mostra Mensagens Toast*/
-    public void mToasts(final String message) {
+    public void mToasts(final int messageInt){
+        //String message = Integer.parseInt(messageInt);
+        View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
+        TextView myText = layout.findViewById(R.id.text);
+        myText.setText(Integer.parseInt(String.valueOf(messageInt)));
+        toast.setView(layout);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER,0,100);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    /*Mostra Mensagens Toast*/
+    public void mToastsText(final String message){
+        //String message = Integer.parseInt(messageInt);
         View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
         TextView myText = layout.findViewById(R.id.text);
         myText.setText(message);
         toast.setView(layout);
-        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER, 0, 100);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER,0,100);
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.show();
     }
@@ -289,7 +306,7 @@ public class ReadCard extends AppCompatActivity {
     private void recuperaNomeCartaCSV(String idCsv) {
         card = deck.getCard(idCsv);
         nameCard = card.getName();
-        mToasts(nameCard);
+        mToastsText(nameCard);
         Log.i(TAG, "recuperaNomeCartaCSV: Nome da carta: "+nameCard);
     }
 
@@ -297,14 +314,14 @@ public class ReadCard extends AppCompatActivity {
     private void recuperaDescricaoCartaCSV(String idCsv) {
         card = deck.getCard(idCsv);
         descriptionCard = card.getDescription();
-        mToasts(descriptionCard);
+        mToastsText(descriptionCard);
     }
 
     /*Recupera a descrição da carta do CSV*/
     private void recuperaDetalhesCartaCSV(String idCsv) {
         card = deck.getCard(idCsv);
         detailsCard = card.getDescription();
-        mToasts(detailsCard);
+        mToastsText(detailsCard);
     }
 
     /*Nome das Cartas*/
@@ -328,7 +345,7 @@ public class ReadCard extends AppCompatActivity {
             Log.i(TAG, "mEmbaixador: " + tagContent);
             recuperaNomeCartaCSV("5");
         } else if (tagContent.equals("")) {
-            mToasts("LEIA UMA CARTA ANTES");
+            mToasts((R.string.leia_uma_carta_antes));
         }
 
         salvarDadosUltimaCartaLida(tagContent);
@@ -354,7 +371,7 @@ public class ReadCard extends AppCompatActivity {
             Log.i(TAG, "mEmbaixador: " + tagContent);
             recuperaDescricaoCartaCSV("5");
         } else if (tagContent.equals("")) {
-            mToasts("LEIA UMA CARTA ANTES");
+            mToasts((R.string.leia_uma_carta_antes));
         }
     }
 
@@ -377,7 +394,7 @@ public class ReadCard extends AppCompatActivity {
             Log.i(TAG, "mEmbaixador: " + tagContent);
             recuperaDetalhesCartaCSV("11");
         } else if (tagContent.equals("")) {
-            mToasts("LEIA UMA CARTA ANTES");
+            mToasts((R.string.leia_uma_carta_antes));
         }
     }
 
@@ -414,13 +431,13 @@ public class ReadCard extends AppCompatActivity {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if (mNfcAdapter == null) {
-            mToasts("O seu dispositivo não possui NFC!!!");
+            mToasts((R.string.seu_dispositivo_nao_possui_nfc));
             finish();
             return;
         }
 
         if ((!mNfcAdapter.isEnabled())) {
-            mToasts("Ative o NFC do seu dispositivo!");
+            mToasts((R.string.ative_o_nfc));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
                 startActivity(intent);
@@ -456,7 +473,7 @@ public class ReadCard extends AppCompatActivity {
                 readTextFromMessage((NdefMessage) parcelables[0], tagText);
             } else {
                 Log.i(TAG, "verificaCadastro: Nenhum texto encontrado na TAG");
-                mToasts("Esta carta ainda não está cadastrada!");
+                mToasts((R.string.carta_nao_cadastrada));
                 alertDialogCadastrar(tagText);
             }
         }
@@ -518,14 +535,14 @@ public class ReadCard extends AppCompatActivity {
 
                 if (!ndef.isWritable()) {
                     Log.i(TAG, "writeNdefMessage: Não é possível gravar nesta TAG, use outra.");
-                    mToasts("Esta TAG está protegida contra gravação. Porfavor use outra.");
+                    mToasts(R.string.tag_protegida_gravacao);
                     ndef.close();
                     return;
                 }
 
                 ndef.writeNdefMessage(ndefMessage);
                 ndef.close();
-                mToasts("Carta cadastrada com sucesso!");
+                mToasts((R.string.carta_cadastrada_sucesso));
 
 
             }

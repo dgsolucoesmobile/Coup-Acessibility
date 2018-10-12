@@ -62,13 +62,13 @@ public class Menu extends AppCompatActivity {
     private String nameCard;
     private String descriptionCard;
 
-    public CharSequence[] personagensCartas = {" Assassino ", " Capitão ", " Condessa ", " Duque ", " Embaixador "};
-
     public int[] mContador = new int[7];
 
     private Button btJogar;
     private Button btApagarDados;
     private Button btAjuda;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +81,9 @@ public class Menu extends AppCompatActivity {
 
         /*Cast dos Botões*/
         mCasts();
+
+        String titulo = String.valueOf(R.string.menu_activity);
+        setTitle(Integer.parseInt(titulo));
 
         /*Checa se tem permissão para usar o NFC*/
         checkPermissionNFC();
@@ -105,7 +108,7 @@ public class Menu extends AppCompatActivity {
         btAjuda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mToasts("Entenda a ação de cada carta!");
+                mToasts((R.string.entenda_acao));
                 startActivity(new Intent(Menu.this, Ajuda.class));
                 //alertAjuda();
             }
@@ -114,92 +117,100 @@ public class Menu extends AppCompatActivity {
     }
 
     /*Cadastrar Cartas*/
-    private void alertDialogCadastrar(final Tag tagText){
+    private void alertDialogCadastrar(final Tag tagText) {
 
-        mToasts("Mantenha o celular próximo da carta até o fim do cadastro!");
+        mToasts((R.string.mantenha_celular_proximo));
+
+        String[] personagensCartas = {
+                getString(R.string.assassino), getString(R.string.capitao),
+                getString(R.string.condessa), getString(R.string.duque),
+                getString(R.string.embaixador)};
 
         new MaterialDialog.Builder(this)
-                .title("Tela de Cadastro!\n\nSelecione a carta que deseja cadastrar!")
+                .title((R.string.tela_cadastro_selecione_carta))
                 .items(personagensCartas)
                 .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int myItem, CharSequence text) {
 
                         switch (myItem) {
-                            case 0:{
+                            case 0: {
                                 switch (mContador[0]) {
                                     case 0: {
                                         Log.i(TAG, "Assassino 1");
-                                        escreverTag(tagText,"As1");
+                                        escreverTag(tagText, "As1");
                                         mContador[0]++;
                                         break;
                                     }
                                     case 1: {
                                         Log.i(TAG, "Assassino 2");
-                                        escreverTag(tagText,"As1");
+                                        escreverTag(tagText, "As1");
                                         mContador[0]++;
                                         break;
                                     }
                                     case 2: {
                                         Log.i(TAG, "Assassino 3");
-                                        escreverTag(tagText,"As1");
+                                        escreverTag(tagText, "As1");
                                         mContador[0]++;
-                                        mToasts("Todas as cartas Assassino já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_assassino));
                                         break;
                                     }
-                                    default: mContador[0] = 0;
+                                    default:
+                                        mContador[0] = 0;
                                 }
                                 break;
                             }
 
-                            case 1:{//Capitão
+                            case 1: {//Capitão
                                 switch (mContador[1]) {
                                     case 0: {
                                         Log.i(TAG, "Capitão 1");
-                                        escreverTag(tagText,"Cp1");
+                                        escreverTag(tagText, "Cp1");
                                         mContador[1]++;
                                         break;
                                     }
                                     case 1: {
                                         Log.i(TAG, "Capitão 2");
-                                        escreverTag(tagText,"Cp1");
+                                        escreverTag(tagText, "Cp1");
                                         mContador[1]++;
                                         break;
                                     }
                                     case 2: {
                                         Log.i(TAG, "Capitão 3");
-                                        escreverTag(tagText,"Cp1");
-                                        mToasts("Todas as cartas Capitão já foram cadastradas!");
+                                        escreverTag(tagText, "Cp1");
+                                        mToasts((R.string.todas_carta_capitao));
                                         mContador[1]++;
                                         break;
                                     }
-                                    default: mContador[1] = 0;
+                                    default:
+                                        mContador[1] = 0;
                                 }
                                 break;
                             }
 
-                            case 2:{//Condessa
+                            case 2: {//Condessa
                                 switch (mContador[2]) {
                                     case 0: {
                                         Log.i(TAG, "Condessa 1");
-                                        escreverTag(tagText,"Cd1");
+                                        escreverTag(tagText, "Cd1");
                                         mContador[2]++;
                                         break;
                                     }
                                     case 1: {
                                         Log.i(TAG, "Condessa 2");
-                                        escreverTag(tagText,"Cd1");
+                                        escreverTag(tagText, "Cd1");
                                         mContador[2]++;
                                         break;
                                     }
                                     case 2: {
                                         Log.i(TAG, "Condessa 3");
-                                        escreverTag(tagText,"Cd1");
+                                        escreverTag(tagText, "Cd1");
                                         mContador[2]++;
-                                        mToasts("Todas as cartas Condessa já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_condessa));
                                         break;
                                     }
-                                    default: mContador[2] = 0;
+                                    default:
+                                        mContador[2] = 0;
                                 }
                                 break;
                             }
@@ -208,50 +219,52 @@ public class Menu extends AppCompatActivity {
                                 switch (mContador[3]) {
                                     case 0: {
                                         Log.i(TAG, "Duque 1");
-                                        escreverTag(tagText,"Dq1");
+                                        escreverTag(tagText, "Dq1");
                                         mContador[3]++;
                                         break;
                                     }
                                     case 1: {
                                         Log.i(TAG, "Duque 2");
-                                        escreverTag(tagText,"Dq1");
+                                        escreverTag(tagText, "Dq1");
                                         mContador[3]++;
                                         break;
                                     }
                                     case 2: {
                                         Log.i(TAG, "Duque 3");
-                                        escreverTag(tagText,"Dq1");
+                                        escreverTag(tagText, "Dq1");
                                         mContador[3]++;
-                                        mToasts("Todas as cartas Duque já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_duque));
                                         break;
                                     }
-                                    default: mContador[3] = 0;
+                                    default:
+                                        mContador[3] = 0;
                                 }
                                 break;
                             }
 
-                            case 4:{//Embaixador
+                            case 4: {//Embaixador
                                 switch (mContador[4]) {
                                     case 0: {
                                         Log.i(TAG, "Embaixador 1");
-                                        escreverTag(tagText,"Em1");
+                                        escreverTag(tagText, "Em1");
                                         mContador[4]++;
                                         break;
                                     }
                                     case 1: {
                                         Log.i(TAG, "Embaixador 2");
-                                        escreverTag(tagText,"Em1");
+                                        escreverTag(tagText, "Em1");
                                         mContador[4]++;
                                         break;
                                     }
                                     case 2: {
                                         Log.i(TAG, "Embaixador 3");
-                                        escreverTag(tagText,"Em1");
+                                        escreverTag(tagText, "Em1");
                                         mContador[4]++;
-                                        mToasts("Todas as cartas Embaixador já foram cadastradas!");
+                                        mToasts((R.string.todas_cartas_embaixador));
                                         break;
                                     }
-                                    default: mContador[4] = 0;
+                                    default:
+                                        mContador[4] = 0;
                                 }
                                 break;
                             }
@@ -277,7 +290,6 @@ public class Menu extends AppCompatActivity {
         deck = Deck.getInstance(this);
         toast = new Toast(this);
         inflater = getLayoutInflater();
-        setTitle(R.string.menu_activity);
 
         btJogar = findViewById(R.id.btAssassino);
         btApagarDados = findViewById(R.id.btCapitao);
@@ -285,7 +297,20 @@ public class Menu extends AppCompatActivity {
     }
 
     /*Mostra Mensagens Toast*/
-    public void mToasts(final String message){
+    public void mToasts(final int messageInt){
+        //String message = Integer.parseInt(messageInt);
+        View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
+        TextView myText = layout.findViewById(R.id.text);
+        myText.setText(Integer.parseInt(String.valueOf(messageInt)));
+        toast.setView(layout);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER,0,100);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    /*Mostra Mensagens Toast*/
+    public void mToastsText(final String message){
+        //String message = Integer.parseInt(messageInt);
         View layout = inflater.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
         TextView myText = layout.findViewById(R.id.text);
         myText.setText(message);
@@ -299,7 +324,7 @@ public class Menu extends AppCompatActivity {
     private void recuperaNomeCartaCSV(String idCsv){
         card = deck.getCard(idCsv);
         nameCard = card.getName();
-        mToasts(nameCard);
+        mToastsText(nameCard);
         Log.i(TAG,"A carta lida foi: "+nameCard);
         startActivity(new Intent(this,ReadCard.class));
     }
@@ -377,14 +402,13 @@ public class Menu extends AppCompatActivity {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if (mNfcAdapter == null){
-            mToasts("O seu dispositivo não possui NFC!");
+            mToasts((R.string.seu_dispositivo_nao_possui_nfc));
             finish();
             return;
         }
 
         if((!mNfcAdapter.isEnabled())){
-            mToasts("Ative o NFC do seu dispositivo! E aproxime o celular da carta" +
-                    " que deseja ler.");
+            mToasts((R.string.ative_o_nfc));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Intent intent = new Intent(Settings.ACTION_NFC_SETTINGS);
                 startActivity(intent);
@@ -397,7 +421,7 @@ public class Menu extends AppCompatActivity {
 
         else {
             Log.i(TAG,"O NFC já está ativado!");
-            mToasts("APROXIME O CELULAR DA CARTA QUE DESEJA LER!");
+            mToasts((R.string.aproxime_da_carta));
         }
     }
 
@@ -424,7 +448,7 @@ public class Menu extends AppCompatActivity {
                 readTextFromMessage((NdefMessage)parcelables[0],tagText);
             }else{
                 Log.i(TAG, "verificaCadastro: Nenhum texto encontrado na TAG");
-                mToasts("Esta carta ainda não está cadastrada!");
+                mToasts((R.string.carta_nao_cadastrada));
                 alertDialogCadastrar(tagText);
             }
         }
@@ -487,14 +511,14 @@ public class Menu extends AppCompatActivity {
 
                 if(!ndef.isWritable()) {
                     Log.i(TAG, "writeNdefMessage: Não é possível gravar nesta TAG, use outra.");
-                    mToasts("Esta TAG está protegida contra gravação. Porfavor use outra.");
+                    mToasts((R.string.tag_protegida_gravacao));
                     ndef.close();
                     return;
                 }
 
                 ndef.writeNdefMessage(ndefMessage);
                 ndef.close();
-                mToasts("Carta cadastrada com sucesso!");
+                mToasts((R.string.carta_cadastrada_sucesso));
 
 
 

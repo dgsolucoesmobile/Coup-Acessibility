@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import tardigrade.Tardigrade;
@@ -229,13 +230,42 @@ public class Deck extends SQLiteOpenHelper implements IDeck {
 
     private String cardFile = "cardbase.csv";
 
-    public void loadDeck(String id){
-        cardFile = "cardbase-" + id + ".csv";
-        loadDeck();
+
+    public void loadDeckParameter(String id){
+
+        /*boolean isEnglish = Locale.getDefault().getLanguage().equals("en");
+        boolean isPortuguese = Locale.getDefault().getLanguage().equals("pt-br");
+        boolean isEspanhol = Locale.getDefault().getLanguage().equals("es");
+        boolean isFranchise = Locale.getDefault().getLanguage().equals("fr");*/
+
+        if(Locale.getDefault().getLanguage().equals("pt-br")){
+            cardFile = "cardbase.csv";
+        }
+
+        if(Locale.getDefault().getLanguage().equals("es")){
+            cardFile = "cardbase-espanhol.csv";
+        }
+
+        if(Locale.getDefault().getLanguage().equals("en")){
+            cardFile = "cardbase-english.csv";
+        }
+
+
+        //loadDeck();
     }
 
     @Override
     public void loadDeck(){
+
+        //Identifica o idioma do dispositivo
+        if(Locale.getDefault().getLanguage().equals("pt-br")){
+            cardFile = "cardbase.csv";
+        }else if(Locale.getDefault().getLanguage().equals("es")){
+            cardFile = "cardbase-espanhol.csv";
+        }else if(Locale.getDefault().getLanguage().equals("en")){
+            cardFile = "cardbase-english.csv";
+        }
+
         ReadFile read = new ReadFile(cardFile);
         read.setOnStartListener(new ICallback() {
             @Override

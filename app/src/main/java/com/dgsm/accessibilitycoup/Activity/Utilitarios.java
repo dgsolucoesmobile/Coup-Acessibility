@@ -18,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.dgsm.accessibilitycoup.R;
 import com.dgsm.accessibilitycoup.Utils.Utils;
 
 import tardigrade.Tardigrade;
@@ -53,8 +54,7 @@ public class Utilitarios extends AppCompatActivity {
     private String[] mEmbaixador = new String[3];
     private String[] mInquisidor = new String[3];
 
-    CharSequence[] values = {" Assassino ", " Capitão ", " Condessa ", " Duque ",
-            " Embaixador ", " Inquisidor "};
+    CharSequence[] values = {String.valueOf(R.string.assassino), String.valueOf(R.string.capitao), String.valueOf(R.string.condessa), String.valueOf(R.string.duque), String.valueOf(R.string.embaixador)};
 
     int[] mContador = new int[6];
 
