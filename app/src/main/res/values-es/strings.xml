@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">Accesibilidad Coup</string>
+
+    <string name="jogar">JUGAR</string>
+    <string name="ajuda">AYUDAR</string>
+    <string name="voltar">REGRESO</string>
+    <string name="apagar_dados">BORRAR DATOS</string>
+    <string name="nome">NOMBRE</string>
+    <string name="descricao">Descripción</string>
+    <string name="detalhes">Detalles</string>
+
+    <!--Nome das Cartas-->
+    <string name="assassino">Asesino</string>
+    <string name="capitao">Capitán</string>
+    <string name="condessa">Condesa</string>
+    <string name="duque">Duque</string>
+    <string name="embaixador">Embajador</string>
+
+    <!--Textos guias para o usuário-->
+    <string name="manter_fim_cadastro">Mantenga el teléfono cerca de la carta hasta el final del registro!</string>
+
+    <!--Título das Activities-->
+    <string name="menu_activity">Pantalla de menú principal</string>
+    <string name="readCard_activity">Pantalla leer información de las cartas</string>
+    <string name="apagarDados_activity">Pantalla de borrar datos</string>
+    <string name="ajuda_activity">Pantalla de ayuda</string>
+    <string name="apagar_carta">Borrar carta</string>
+    <string name="tela_apagar_dados">Pantalla de Borrar Datos</string>
+    <string name="seu_dispositivo_nao_possui_nfc">Su dispositivo no tiene NFC!</string>
+    <string name="ative_o_nfc">¡Activar el NFC de su dispositivo! Y acerque el celular de la carta que desea leer</string>
+    <string name="aproxime_da_carta">APROXIMO EL CELULAR DE LA CARTA QUE DESEA LEER</string>
+    <string name="carta_nao_cadastrada">¡Esta carta aún no está registrada!</string>
+    <string name="mantenha_celular_proximo_carta">Mantenga el teléfono cerca de la carta hasta el final del proceso.</string>
+    <string name="tela_confirmacao">¡TELA DE CONFIRMACIÓN!</string>
+    <string name="carta_apagada">¡La carta borrada con éxito!</string>
+    <string name="acao_cancelada">¡Acción cancelada con éxito!</string>
+    <string name="todas_cartas_assassino">¡Todas las cartas Asesino ya han sido registradas!</string>
+    <string name="todas_carta_capitao">¡Todas las cartas Capitán ya han sido registradas!</string>
+    <string name="todas_cartas_condessa">¡Todas las cartas Condesa ya han sido registradas!</string>
+    <string name="todas_cartas_duque">¡Todas las cartas Duque ya han sido registradas!</string>
+    <string name="todas_cartas_embaixador">Todas las cartas Embajador ya han sido registradas!</string>
+    <string name="tag_protegida_gravacao">Esta TAG está protegida contra escritura. Por favor use otra.</string>
+    <string name="carta_cadastrada_sucesso">¡La carta registrada con éxito!</string>
+    <string name="dados_apagados_sucesso">Los datos borrados con éxito !!!</string>
+    <string name="tela_ajudas">Pantalla de Ayuda</string>
+    <string name="entenda_acao">¡Comprenda la acción de cada carta!</string>
+    <string name="mantenha_celular_proximo">¡Mantenga el teléfono cerca de la carta hasta el final del registro!</string>
+    <string name="tela_cadastro_selecione_carta">¡Pantalla de registro! ¡Seleccione la carta que desea registrar!</string>
+    <string name="tela_ler_informacoes_cartas">Pantalla leer información de las cartas</string>
+    <string name="leia_uma_carta_antes">LEA UNA CARTA ANTES</string>
+
+</resources>
