@@ -82,6 +82,7 @@ public class Menu extends AppCompatActivity {
         /*Cast dos Botões*/
         mCasts();
 
+
         String titulo = String.valueOf(R.string.menu_activity);
         setTitle(Integer.parseInt(titulo));
 
