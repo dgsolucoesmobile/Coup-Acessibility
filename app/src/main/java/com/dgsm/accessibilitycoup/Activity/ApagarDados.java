@@ -237,7 +237,8 @@ public class ApagarDados extends AppCompatActivity {
         String[] personagensCartas = {
                 getString(R.string.assassino), getString(R.string.capitao),
                 getString(R.string.condessa), getString(R.string.duque),
-                getString(R.string.embaixador)};
+                getString(R.string.embaixador),
+        getString(R.string.ajuda)};
 
         new MaterialDialog.Builder(this)
                 .title(R.string.tela_cadastro_selecione_carta)

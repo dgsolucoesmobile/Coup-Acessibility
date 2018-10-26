@@ -39,6 +39,8 @@ import tardigrade.Tardigrade;
 import tardigrade.deck.ICard;
 import tardigrade.resources.impl.Deck;
 
+import static com.blankj.utilcode.util.ActivityUtils.startActivity;
+
 public class Menu extends AppCompatActivity {
 
     static final String TAG = "Menu";
